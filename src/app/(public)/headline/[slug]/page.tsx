@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
   const { data: headline } = await supabase
     .from('headlines')
-    .select('title, ai_summary, slug, original_url, published_at, category')
+    .select('title, ai_summary, slug, original_url, published_at, category, image_url')
     .eq('slug', slug)
     .maybeSingle();
 
@@ -63,9 +63,6 @@ export default async function HeadlinePage({ params }: Props) {
         alt={headline.title}
         className="w-full h-64 object-cover rounded mb-4"
         referrerPolicy="no-referrer"
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src = fallbackImage;
-        }}
       />
 
       <h1 className="text-2xl font-bold text-gray-900 mb-4">{headline.title}</h1>
