@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateCommentary } from '@/lib/ai/commentary';
+import { matchImage } from '@/lib/images/match-image';
 
 export async function GET(req: Request) {
   // Protect endpoint with cron secret
@@ -12,7 +13,6 @@ export async function GET(req: Request) {
   const supabase = await createClient();
 
   // Get pending headlines (limit 20 per run)
-  // Once you have OpenAI credits, 20 is safe. If using Gemini free fallback, reduce to 5.
   const { data: pending, error: fetchError } = await supabase
     .from('headlines')
     .select('id, title')
@@ -28,8 +28,13 @@ export async function GET(req: Request) {
 
   for (const headline of pending) {
     try {
+      // 1. Generate AI commentary
       const analysis = await generateCommentary(headline.title);
 
+      // 2. Match local image
+      const imageUrl = matchImage(headline.title);
+
+      // 3. Update database
       const { error: updateError } = await supabase
         .from('headlines')
         .update({
@@ -41,6 +46,7 @@ export async function GET(req: Request) {
           ai_model_used: 'openai', // or 'openrouter' depending on actual path
           meta_title: `${headline.title.substring(0, 55)} | VibeStale`,
           meta_description: analysis.summary.substring(0, 155),
+          image_url: imageUrl, // set matched image, may be null
           updated_at: new Date().toISOString(),
         })
         .eq('id', headline.id);
