@@ -1,0 +1,25 @@
+name: Hourly Cron
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # runs every hour at minute 0
+  workflow_dispatch:       # allows manual trigger from GitHub Actions tab
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call ingest endpoint
+        run: |
+          curl -X GET https://vibestale.vercel.app/api/cron/ingest \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  ai-analysis:
+    runs-on: ubuntu-latest
+    needs: ingest
+    steps:
+      - name: Wait 15 minutes, then call ai-analysis endpoint
+        run: |
+          sleep 900
+          curl -X GET https://vibestale.vercel.app/api/cron/ai-analysis \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
