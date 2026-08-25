@@ -1,4 +1,4 @@
-name: Frequent News Fetch
+name: Frequent News and Music Fetch
 
 on:
   schedule:
@@ -6,18 +6,34 @@ on:
   workflow_dispatch:         # allows manual trigger
 
 jobs:
-  ingest:
+  news-ingest:
     runs-on: ubuntu-latest
     steps:
-      - name: Call ingest endpoint
+      - name: Call news ingest endpoint
         run: |
           curl -X GET https://vibestale3.vercel.app/api/cron/ingest \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
 
-  ai-analysis:
+  news-ai-analysis:
     runs-on: ubuntu-latest
     steps:
-      - name: Call ai-analysis endpoint
+      - name: Call news AI analysis endpoint
         run: |
           curl -X GET https://vibestale3.vercel.app/api/cron/ai-analysis \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  music-ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call music ingest endpoint
+        run: |
+          curl -X GET https://vibestale3.vercel.app/api/cron/music-ingest \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  music-ai-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call music AI analysis endpoint
+        run: |
+          curl -X GET https://vibestale3.vercel.app/api/cron/music-analysis \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

@@ -13,6 +13,7 @@ export interface AIAnalysis {
   sentiment: 'positive' | 'negative' | 'neutral';
   keyEntities: string[];
   confidenceScore: number;
+  category: string; // new field
 }
 
 export async function generateCommentary(title: string): Promise<AIAnalysis> {
@@ -31,7 +32,7 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
       {
         role: 'system',
         content:
-          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Always respond in valid JSON with keys: summary, sentiment, key_entities, confidence_score.',
+          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Always respond in valid JSON with keys: summary, sentiment, key_entities, confidence_score, category. Category must be one of: politics, business, sports, tech, entertainment, general.',
       },
       {
         role: 'user',
@@ -50,6 +51,7 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
     sentiment: parsed.sentiment,
     keyEntities: parsed.key_entities || [],
     confidenceScore: parsed.confidence_score || 0.8,
+    category: parsed.category || 'general',
   };
 }
 
@@ -60,7 +62,7 @@ async function generateWithOpenRouter(title: string): Promise<AIAnalysis> {
       {
         role: 'system',
         content:
-          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8}',
+          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics"}',
       },
       {
         role: 'user',
@@ -94,6 +96,7 @@ async function generateWithOpenRouter(title: string): Promise<AIAnalysis> {
     sentiment: parsed.sentiment || 'neutral',
     keyEntities: parsed.key_entities || [],
     confidenceScore: parsed.confidence_score || 0.5,
+    category: parsed.category || 'general',
   };
 }
 
@@ -103,5 +106,6 @@ function createGenericAnalysis(title: string): AIAnalysis {
     sentiment: 'neutral',
     keyEntities: [],
     confidenceScore: 0.3,
+    category: 'general',
   };
 }

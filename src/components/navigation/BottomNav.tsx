@@ -12,11 +12,12 @@ export default function BottomNav() {
     { href: '/category/tech', label: 'Tech', icon: '💻' },
     { href: '/category/sports', label: 'Sports', icon: '⚽' },
     { href: '/category/entertainment', label: 'Entertainment', icon: '🎬' },
+    { href: '/music', label: 'Music', icon: '🎵' },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden">
-      <div className="grid grid-cols-5 h-16">
+      <div className="grid grid-cols-6 h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (

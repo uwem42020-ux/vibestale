@@ -12,7 +12,6 @@ export async function GET(req: Request) {
 
   const supabase = await createClient();
 
-  // Get pending headlines (limit 20 per run)
   const { data: pending, error: fetchError } = await supabase
     .from('headlines')
     .select('id, title')
@@ -28,13 +27,9 @@ export async function GET(req: Request) {
 
   for (const headline of pending) {
     try {
-      // 1. Generate AI commentary
       const analysis = await generateCommentary(headline.title);
-
-      // 2. Match local image
       const imageUrl = matchImage(headline.title);
 
-      // 3. Update database
       const { error: updateError } = await supabase
         .from('headlines')
         .update({
@@ -43,10 +38,11 @@ export async function GET(req: Request) {
           ai_key_entities: analysis.keyEntities,
           ai_confidence_score: analysis.confidenceScore,
           ai_analysis_status: 'completed',
-          ai_model_used: 'openai', // or 'openrouter' depending on actual path
+          ai_model_used: 'openai', // adjust if using openrouter
           meta_title: `${headline.title.substring(0, 55)} | VibeStale`,
           meta_description: analysis.summary.substring(0, 155),
-          image_url: imageUrl, // set matched image, may be null
+          image_url: imageUrl,
+          category: analysis.category, // store AI category
           updated_at: new Date().toISOString(),
         })
         .eq('id', headline.id);
