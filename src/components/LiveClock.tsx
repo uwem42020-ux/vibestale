@@ -20,7 +20,7 @@ export default function LiveClock() {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false,
+    hour12: true,          // <-- changed to true for 12-hour format
     timeZone: 'Africa/Lagos',
   }).format(now);
 
