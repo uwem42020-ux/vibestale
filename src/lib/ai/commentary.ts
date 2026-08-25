@@ -1,7 +1,11 @@
 import OpenAI from 'openai';
 
-const openAI = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Primary provider: OpenAI
+const openAI = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
+// OpenRouter fallback client
 const openRouter = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: 'https://openrouter.ai/api/v1',
@@ -13,16 +17,40 @@ export interface AIAnalysis {
   sentiment: 'positive' | 'negative' | 'neutral';
   keyEntities: string[];
   confidenceScore: number;
-  category: string; // new field
+  category: string;
 }
 
 export async function generateCommentary(title: string): Promise<AIAnalysis> {
+  // Try OpenAI first
   try {
     return await generateWithOpenAI(title);
   } catch (openAIError) {
-    console.warn('OpenAI failed, falling back to OpenRouter:', openAIError);
-    return await generateWithOpenRouter(title);
+    console.warn('OpenAI failed, trying Mistral fallback...', openAIError);
   }
+
+  // Try Mistral on OpenRouter
+  try {
+    return await generateWithOpenRouter(title, 'mistralai/mistral-7b-instruct:free');
+  } catch (mistralError) {
+    console.warn('Mistral fallback failed, trying Gemma...', mistralError);
+  }
+
+  // Try Gemma on OpenRouter
+  try {
+    return await generateWithOpenRouter(title, 'google/gemma-2-9b-it:free');
+  } catch (gemmaError) {
+    console.warn('Gemma fallback failed, trying NVIDIA...', gemmaError);
+  }
+
+  // Try NVIDIA on OpenRouter
+  try {
+    return await generateWithOpenRouter(title, 'nvidia/nemotron-3.5-lightning:free');
+  } catch (nvidiaError) {
+    console.warn('NVIDIA fallback failed, using generic summary...', nvidiaError);
+  }
+
+  // Final fallback: guaranteed success
+  return createGenericAnalysis(title);
 }
 
 async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
@@ -48,16 +76,19 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
   const parsed = JSON.parse(content);
   return {
     summary: parsed.summary,
-    sentiment: parsed.sentiment,
+    sentiment: parsed.sentiment || 'neutral',
     keyEntities: parsed.key_entities || [],
     confidenceScore: parsed.confidence_score || 0.8,
     category: parsed.category || 'general',
   };
 }
 
-async function generateWithOpenRouter(title: string): Promise<AIAnalysis> {
+async function generateWithOpenRouter(
+  title: string,
+  model: string
+): Promise<AIAnalysis> {
   const completion = await openRouter.chat.completions.create({
-    model: 'nvidia/nemotron-3.5-lightning:free',
+    model,
     messages: [
       {
         role: 'system',
@@ -72,7 +103,7 @@ async function generateWithOpenRouter(title: string): Promise<AIAnalysis> {
     max_tokens: 300,
   });
 
-  let content = completion.choices[0].message.content;
+  const content = completion.choices[0].message.content;
   if (!content) throw new Error('Empty OpenRouter response');
 
   let parsed: any;
@@ -84,10 +115,10 @@ async function generateWithOpenRouter(title: string): Promise<AIAnalysis> {
       try {
         parsed = JSON.parse(jsonMatch[0]);
       } catch (innerError) {
-        return createGenericAnalysis(title);
+        throw new Error('Invalid JSON from OpenRouter');
       }
     } else {
-      return createGenericAnalysis(title);
+      throw new Error('No JSON found in OpenRouter response');
     }
   }
 
