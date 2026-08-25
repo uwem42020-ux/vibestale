@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import WhatsAppShare from '@/components/share/WhatsAppShare';
+import SourceBadge from '@/components/SourceBadge';
 import type { Metadata } from 'next';
 
 type Props = {
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
   const { data: headline } = await supabase
     .from('headlines')
-    .select('title, ai_summary, slug, original_url, published_at, category, image_url')
+    .select('title, ai_summary, slug, original_url, published_at, category, image_url, sources(name, base_url)')
     .eq('slug', slug)
     .maybeSingle();
 
@@ -42,7 +43,7 @@ export default async function HeadlinePage({ params }: Props) {
 
   const { data: headline, error } = await supabase
     .from('headlines')
-    .select('*')
+    .select('*, sources(name, base_url)')
     .eq('slug', slug)
     .is('deleted_at', null)
     .maybeSingle();
@@ -67,10 +68,23 @@ export default async function HeadlinePage({ params }: Props) {
 
       <h1 className="text-2xl font-bold text-gray-900 mb-4">{headline.title}</h1>
 
-      <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
-        <span>Source ID: {headline.source_id}</span>
+      <div className="flex items-center gap-2 mb-4 text-sm text-gray-500 flex-wrap">
+        {headline.sources && (
+          <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
+        )}
         <span>·</span>
-        <span>{new Date(headline.published_at || '').toLocaleDateString()}</span>
+        <span>
+          {new Date(headline.published_at || '').toLocaleString('en-NG', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          })}
+        </span>
+        <span>·</span>
+        <span className="capitalize">{headline.category || 'general'}</span>
       </div>
 
       {headline.ai_summary && (

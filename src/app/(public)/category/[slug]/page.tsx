@@ -11,13 +11,13 @@ export default async function CategoryPage({ params }: Props) {
 
   const { data: headlines, error } = await supabase
     .from('headlines')
-    .select('*')
+    .select('*, sources(name, base_url)')
     .eq('category', slug)
     .eq('ai_analysis_status', 'completed')
     .eq('status', 'published')
     .is('deleted_at', null)
     .order('published_at', { ascending: false })
-    .limit(20);
+    .limit(50);
 
   if (error) {
     console.error('Error fetching category headlines:', error);
@@ -32,7 +32,7 @@ export default async function CategoryPage({ params }: Props) {
       {headlines.length === 0 ? (
         <p>No headlines in this category yet.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {headlines.map((headline) => (
             <HeadlineCard key={headline.id} headline={headline} />
           ))}
