@@ -13,7 +13,9 @@ type Video = {
 export default function VideoCard({ video }: { video: Video }) {
   const [playing, setPlaying] = useState(false);
 
-  const thumbnail = video.thumbnail_url || `https://img.youtube.com/vi/${video.youtube_video_id}/hqdefault.jpg`;
+  const thumbnail =
+    video.thumbnail_url ||
+    `https://img.youtube.com/vi/${video.youtube_video_id}/hqdefault.jpg`;
 
   return (
     <article className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden w-64 flex-shrink-0">
@@ -22,7 +24,7 @@ export default function VideoCard({ video }: { video: Video }) {
           <iframe
             width="100%"
             height="100%"
-            src={`https://www.youtube.com/embed/${video.youtube_video_id}?autoplay=1&rel=0`}
+            src={`https://www.youtube-nocookie.com/embed/${video.youtube_video_id}?autoplay=1&rel=0`}
             title={video.title}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
