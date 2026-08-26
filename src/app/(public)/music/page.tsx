@@ -1,5 +1,4 @@
-import TrackCard from '@/components/music/TrackCard';
-import Link from 'next/link';
+import TrackRow from '@/components/music/TrackRow';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +9,7 @@ const ARTISTS = [
   'BNXN', 'Seyi Vibez', 'Ruger', 'Ckay', 'Joeboy', 'Lojay', 'Victony',
   'Bella Shmurda', 'Zinoleesky', 'Mohbad', 'Portable', 'Shallipopi',
   'Odumodublvck', 'Bloody Civilian', 'Qing Madi', 'Llona', 'Ayo Maff',
-  'Fave', 'Shenseea', 'Gyakie', 'Ayra Starr',
+  'Fave', 'Gyakie',
 
   // Veteran / Legends
   '2Baba', 'D\'banj', 'P-Square', 'Don Jazzy', 'Flavour', 'Phyno',
@@ -21,7 +20,7 @@ const ARTISTS = [
   'Sinach', 'Mercy Chinwo', 'Tope Alabi', 'Nathaniel Bassey', 'Dunsin Oyekan',
   'Joe Praize', 'Ada Ehi',
 
-  // Hip‑Hop / Rap
+  // Hip-Hop / Rap
   'Falz', 'Ladipoe', 'Blaqbonez', 'PsychoYP', 'Ycee', 'Dremo',
 
   // Alternative / R&B
@@ -33,7 +32,7 @@ const ARTISTS = [
   'Small Doctor', 'Slimcase', 'Mr Real',
 
   // Reggae / Dancehall
-  'Patoranking', 'Burna Boy', 'Jesse Jagz', 'Runtown', 'Skales'
+  'Patoranking', 'Jesse Jagz', 'Runtown', 'Skales'
 ];
 
 type Track = {
@@ -49,7 +48,7 @@ type Track = {
 async function fetchArtistTracks(artist: string): Promise<Track[]> {
   try {
     const response = await fetch(
-      `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=3`,
+      `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=25`,
       { next: { revalidate: 3600 } }
     );
     if (!response.ok) return [];
@@ -61,46 +60,59 @@ async function fetchArtistTracks(artist: string): Promise<Track[]> {
   }
 }
 
+function getGenre(primaryGenreName?: string): string {
+  if (!primaryGenreName) return 'Other';
+  const genre = primaryGenreName.toLowerCase();
+  if (genre.includes('afro') || genre.includes('pop') || genre.includes('dance')) return 'Afrobeats & Pop';
+  if (genre.includes('hip') || genre.includes('rap')) return 'Hip-Hop & Rap';
+  if (genre.includes('gospel') || genre.includes('christian')) return 'Gospel';
+  if (genre.includes('r&b') || genre.includes('soul')) return 'R&B & Soul';
+  if (genre.includes('reggae') || genre.includes('dancehall')) return 'Reggae & Dancehall';
+  if (genre.includes('alternative')) return 'Alternative';
+  return 'Other';
+}
+
 export default async function MusicPage() {
-  // Fetch tracks for all artists in parallel (limit 3 each)
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
   const allTracks = results.flat();
 
-  // Remove duplicates (by track name + artist)
+  // Remove duplicates
   const uniqueTracks = Array.from(
     new Map(allTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  // Shuffle and take up to 48 tracks
-  const shuffled = uniqueTracks.sort(() => 0.5 - Math.random()).slice(0, 48);
+  // Group by genre
+  const sections: Record<string, Track[]> = {};
+  for (const track of uniqueTracks) {
+    const genre = getGenre(track.primaryGenreName);
+    if (!sections[genre]) sections[genre] = [];
+    sections[genre].push(track);
+  }
+
+  // Define order of sections
+  const orderedSections = [
+    'Afrobeats & Pop',
+    'Hip-Hop & Rap',
+    'Gospel',
+    'R&B & Soul',
+    'Reggae & Dancehall',
+    'Alternative',
+    'Other',
+  ];
 
   return (
     <div>
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">🎵 Tracks</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Curated Nigerian music from iTunes — 30‑second previews.
-          </p>
-        </div>
-        <Link
-          href="/music-news"
-          className="text-sm text-green-700 hover:underline whitespace-nowrap"
-        >
-          Music News →
-        </Link>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">🎵 Music</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Curated Nigerian tracks by genre — 30‑second previews from iTunes.
+        </p>
       </div>
 
-      {shuffled.length === 0 ? (
-        <p>No tracks available right now.</p>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {shuffled.map((track) => (
-            <TrackCard key={`${track.trackName}-${track.artistName}`} track={track} />
-          ))}
-        </div>
-      )}
+      {orderedSections.map((sectionName) => {
+        const tracks = sections[sectionName] || [];
+        return <TrackRow key={sectionName} title={sectionName} tracks={tracks} />;
+      })}
     </div>
   );
 }
