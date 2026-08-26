@@ -45,6 +45,12 @@ type Track = {
   primaryGenreName?: string;
 };
 
+type Artist = {
+  name: string;
+  imageUrl: string;
+  link: string;
+};
+
 async function fetchArtistTracks(artist: string): Promise<Track[]> {
   try {
     const response = await fetch(
@@ -76,12 +82,25 @@ export default async function MusicPage() {
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
   const allTracks = results.flat();
 
-  // Remove duplicates
+  // Unique tracks
   const uniqueTracks = Array.from(
     new Map(allTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  // Group by genre
+  // Build circular artist list (use first track's artwork for each artist)
+  const artistMap = new Map<string, Artist>();
+  for (const track of uniqueTracks) {
+    if (!artistMap.has(track.artistName)) {
+      artistMap.set(track.artistName, {
+        name: track.artistName,
+        imageUrl: track.artworkUrl100?.replace('100x100', '300x300') || '/placeholder.png',
+        link: track.trackViewUrl,
+      });
+    }
+  }
+  const popularArtists = Array.from(artistMap.values()).slice(0, 20);
+
+  // Group tracks by genre
   const sections: Record<string, Track[]> = {};
   for (const track of uniqueTracks) {
     const genre = getGenre(track.primaryGenreName);
@@ -89,7 +108,6 @@ export default async function MusicPage() {
     sections[genre].push(track);
   }
 
-  // Define order of sections
   const orderedSections = [
     'Afrobeats & Pop',
     'Hip-Hop & Rap',
@@ -109,6 +127,31 @@ export default async function MusicPage() {
         </p>
       </div>
 
+      {/* Popular Artists (circular) */}
+      {popularArtists.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Artists</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
+            {popularArtists.map((artist) => (
+              <div key={artist.name} className="snap-start flex-shrink-0">
+                {/* ArtistCircle */}
+                <div className="flex flex-col items-center gap-2 w-20">
+                  <a href={artist.link} className="block">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-500 transition">
+                      <img src={artist.imageUrl} alt={artist.name} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                  </a>
+                  <span className="text-xs text-center text-gray-700 line-clamp-2 leading-tight">
+                    {artist.name}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Genre sections */}
       {orderedSections.map((sectionName) => {
         const tracks = sections[sectionName] || [];
         return <TrackRow key={sectionName} title={sectionName} tracks={tracks} />;
