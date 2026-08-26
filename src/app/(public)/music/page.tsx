@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import TrackRow from '@/components/music/TrackRow';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +43,7 @@ async function fetchArtistTracks(artist: string): Promise<Track[]> {
     const data = await response.json();
     return data.results || [];
   } catch (error) {
+    console.error(`Failed to fetch tracks for ${artist}:`, error);
     return [];
   }
 }
@@ -60,11 +62,16 @@ function getGenre(primaryGenreName?: string): string {
 
 export default async function MusicPage() {
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
-  const playable = results.flat().filter((track) => track.previewUrl);
-  const unique = Array.from(new Map(playable.map((track) => [`${track.trackName}-${track.artistName}`, track])).values());
+  const allTracks = results.flat();
+
+  const playableTracks = allTracks.filter((track) => track.previewUrl);
+
+  const uniqueTracks = Array.from(
+    new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
+  );
 
   const artistMap = new Map<string, Artist>();
-  for (const track of unique) {
+  for (const track of uniqueTracks) {
     if (!artistMap.has(track.artistName)) {
       artistMap.set(track.artistName, {
         name: track.artistName,
@@ -76,19 +83,37 @@ export default async function MusicPage() {
   const popularArtists = Array.from(artistMap.values()).slice(0, 15);
 
   const sections: Record<string, Track[]> = {};
-  for (const track of unique) {
+  for (const track of uniqueTracks) {
     const genre = getGenre(track.primaryGenreName);
     if (!sections[genre]) sections[genre] = [];
     sections[genre].push(track);
   }
 
-  const orderedSections = ['Afrobeats & Pop', 'Hip-Hop & Rap', 'Gospel', 'R&B & Soul', 'Reggae & Dancehall', 'Alternative', 'Other'];
+  const orderedSections = [
+    'Afrobeats & Pop',
+    'Hip-Hop & Rap',
+    'Gospel',
+    'R&B & Soul',
+    'Reggae & Dancehall',
+    'Alternative',
+    'Other',
+  ];
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">🎵 Music</h1>
-        <p className="text-sm text-gray-500 mt-1">Curated Nigerian tracks — 30-second previews.</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">🎵 Music</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Curated Nigerian tracks — 30‑second previews.
+          </p>
+        </div>
+        <Link
+          href="/music-news"
+          className="text-sm text-green-700 hover:underline whitespace-nowrap"
+        >
+          Music News →
+        </Link>
       </div>
 
       {popularArtists.length > 0 && (
@@ -103,7 +128,9 @@ export default async function MusicPage() {
                       <img src={artist.imageUrl} alt={artist.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </a>
-                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">{artist.name}</span>
+                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">
+                    {artist.name}
+                  </span>
                 </div>
               </div>
             ))}
