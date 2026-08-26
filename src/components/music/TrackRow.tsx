@@ -12,9 +12,7 @@ type Track = {
 
 export default function TrackRow({ title, tracks, max = 10 }: { title: string; tracks: Track[]; max?: number }) {
   if (!tracks || tracks.length === 0) return null;
-
   const visibleTracks = tracks.slice(0, max);
-
   return (
     <section className="mb-6">
       <h2 className="text-lg font-bold text-gray-900 mb-2">{title}</h2>
