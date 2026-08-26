@@ -3,23 +3,16 @@ import TrackRow from '@/components/music/TrackRow';
 export const dynamic = 'force-dynamic';
 
 const ARTISTS = [
-  // Core popular artists with reliable previews
   'Burna Boy', 'Wizkid', 'Davido', 'Tiwa Savage', 'Asake', 'Rema',
   'Ayra Starr', 'Fireboy DML', 'Omah Lay', 'Tems', 'Kizz Daniel',
   'BNXN', 'Ruger', 'Ckay', 'Joeboy', 'Lojay', 'Victony',
   'Bella Shmurda', 'Zinoleesky', 'Shallipopi', 'Odumodublvck',
   'Qing Madi', 'Llona', 'Ayo Maff', 'Fave',
-  // Legends
   '2Baba', 'D\'banj', 'P-Square', 'Flavour', 'Olamide', 'Yemi Alade', 'Simi',
-  // Gospel
   'Sinach', 'Mercy Chinwo', 'Nathaniel Bassey', 'Joe Praize',
-  // Hip-Hop
   'Falz', 'Ladipoe', 'Blaqbonez', 'Ycee',
-  // R&B / Alternative
   'Tay Iwar', 'Nonso Amadi', 'Amaarae', 'Wurld',
-  // Street
   'Naira Marley', 'Lil Kesh', '9ice',
-  // Reggae / Dancehall
   'Patoranking', 'Runtown', 'Skales'
 ];
 
@@ -43,13 +36,12 @@ async function fetchArtistTracks(artist: string): Promise<Track[]> {
   try {
     const response = await fetch(
       `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=5`,
-      { next: { revalidate: 21600 } } // 6 hours cache
+      { next: { revalidate: 21600 } }
     );
     if (!response.ok) return [];
     const data = await response.json();
     return data.results || [];
   } catch (error) {
-    console.error(`Failed to fetch tracks for ${artist}:`, error);
     return [];
   }
 }
@@ -68,19 +60,11 @@ function getGenre(primaryGenreName?: string): string {
 
 export default async function MusicPage() {
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
-  const allTracks = results.flat();
+  const playable = results.flat().filter((track) => track.previewUrl);
+  const unique = Array.from(new Map(playable.map((track) => [`${track.trackName}-${track.artistName}`, track])).values());
 
-  // Keep only playable tracks
-  const playableTracks = allTracks.filter((track) => track.previewUrl);
-
-  // Remove duplicates
-  const uniqueTracks = Array.from(
-    new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
-  );
-
-  // Build circular artist list
   const artistMap = new Map<string, Artist>();
-  for (const track of uniqueTracks) {
+  for (const track of unique) {
     if (!artistMap.has(track.artistName)) {
       artistMap.set(track.artistName, {
         name: track.artistName,
@@ -91,34 +75,22 @@ export default async function MusicPage() {
   }
   const popularArtists = Array.from(artistMap.values()).slice(0, 15);
 
-  // Group by genre
   const sections: Record<string, Track[]> = {};
-  for (const track of uniqueTracks) {
+  for (const track of unique) {
     const genre = getGenre(track.primaryGenreName);
     if (!sections[genre]) sections[genre] = [];
     sections[genre].push(track);
   }
 
-  const orderedSections = [
-    'Afrobeats & Pop',
-    'Hip-Hop & Rap',
-    'Gospel',
-    'R&B & Soul',
-    'Reggae & Dancehall',
-    'Alternative',
-    'Other',
-  ];
+  const orderedSections = ['Afrobeats & Pop', 'Hip-Hop & Rap', 'Gospel', 'R&B & Soul', 'Reggae & Dancehall', 'Alternative', 'Other'];
 
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">🎵 Music</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Curated Nigerian tracks — 30‑second previews.
-        </p>
+        <p className="text-sm text-gray-500 mt-1">Curated Nigerian tracks — 30-second previews.</p>
       </div>
 
-      {/* Popular Artists (circular) */}
       {popularArtists.length > 0 && (
         <section className="mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-2">Popular Artists</h2>
@@ -131,9 +103,7 @@ export default async function MusicPage() {
                       <img src={artist.imageUrl} alt={artist.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </a>
-                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">
-                    {artist.name}
-                  </span>
+                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">{artist.name}</span>
                 </div>
               </div>
             ))}
@@ -141,7 +111,6 @@ export default async function MusicPage() {
         </section>
       )}
 
-      {/* Genre sections (limit 10 per section) */}
       {orderedSections.map((sectionName) => {
         const tracks = sections[sectionName] || [];
         return <TrackRow key={sectionName} title={sectionName} tracks={tracks} max={10} />;
