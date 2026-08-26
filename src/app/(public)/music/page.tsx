@@ -3,36 +3,24 @@ import TrackRow from '@/components/music/TrackRow';
 export const dynamic = 'force-dynamic';
 
 const ARTISTS = [
-  // Afrobeats / Mainstream
+  // Core popular artists with reliable previews
   'Burna Boy', 'Wizkid', 'Davido', 'Tiwa Savage', 'Asake', 'Rema',
   'Ayra Starr', 'Fireboy DML', 'Omah Lay', 'Tems', 'Kizz Daniel',
-  'BNXN', 'Seyi Vibez', 'Ruger', 'Ckay', 'Joeboy', 'Lojay', 'Victony',
-  'Bella Shmurda', 'Zinoleesky', 'Mohbad', 'Portable', 'Shallipopi',
-  'Odumodublvck', 'Bloody Civilian', 'Qing Madi', 'Llona', 'Ayo Maff',
-  'Fave', 'Gyakie',
-
-  // Veteran / Legends
-  '2Baba', 'D\'banj', 'P-Square', 'Don Jazzy', 'Flavour', 'Phyno',
-  'Olamide', 'M.I Abaga', 'Ice Prince', 'Banky W', 'Timaya', 'Kcee',
-  'Tekno', 'Yemi Alade', 'Simi', 'Adekunle Gold', 'Niniola', 'Reekado Banks',
-
+  'BNXN', 'Ruger', 'Ckay', 'Joeboy', 'Lojay', 'Victony',
+  'Bella Shmurda', 'Zinoleesky', 'Shallipopi', 'Odumodublvck',
+  'Qing Madi', 'Llona', 'Ayo Maff', 'Fave',
+  // Legends
+  '2Baba', 'D\'banj', 'P-Square', 'Flavour', 'Olamide', 'Yemi Alade', 'Simi',
   // Gospel
-  'Sinach', 'Mercy Chinwo', 'Tope Alabi', 'Nathaniel Bassey', 'Dunsin Oyekan',
-  'Joe Praize', 'Ada Ehi',
-
-  // Hip-Hop / Rap
-  'Falz', 'Ladipoe', 'Blaqbonez', 'PsychoYP', 'Ycee', 'Dremo',
-
-  // Alternative / R&B
-  'Tay Iwar', 'Nonso Amadi', 'Odunsi', 'Santi', 'Cruel Santino', 'Amaarae',
-  'Tems', 'Wurld', 'Show Dem Camp', 'Ric Hassani',
-
-  // Street / Indigenous
-  'Naira Marley', 'Lil Kesh', 'CDQ', 'Oritse Femi', 'Qdot', '9ice',
-  'Small Doctor', 'Slimcase', 'Mr Real',
-
+  'Sinach', 'Mercy Chinwo', 'Nathaniel Bassey', 'Joe Praize',
+  // Hip-Hop
+  'Falz', 'Ladipoe', 'Blaqbonez', 'Ycee',
+  // R&B / Alternative
+  'Tay Iwar', 'Nonso Amadi', 'Amaarae', 'Wurld',
+  // Street
+  'Naira Marley', 'Lil Kesh', '9ice',
   // Reggae / Dancehall
-  'Patoranking', 'Jesse Jagz', 'Runtown', 'Skales'
+  'Patoranking', 'Runtown', 'Skales'
 ];
 
 type Track = {
@@ -54,8 +42,8 @@ type Artist = {
 async function fetchArtistTracks(artist: string): Promise<Track[]> {
   try {
     const response = await fetch(
-      `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=25`,
-      { next: { revalidate: 3600 } }
+      `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=5`,
+      { next: { revalidate: 21600 } } // 6 hours cache
     );
     if (!response.ok) return [];
     const data = await response.json();
@@ -82,15 +70,15 @@ export default async function MusicPage() {
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
   const allTracks = results.flat();
 
-  // Filter to only tracks with a preview URL
+  // Keep only playable tracks
   const playableTracks = allTracks.filter((track) => track.previewUrl);
 
-  // Remove duplicates (by track name + artist)
+  // Remove duplicates
   const uniqueTracks = Array.from(
     new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  // Build circular artist list from playable tracks only
+  // Build circular artist list
   const artistMap = new Map<string, Artist>();
   for (const track of uniqueTracks) {
     if (!artistMap.has(track.artistName)) {
@@ -101,7 +89,7 @@ export default async function MusicPage() {
       });
     }
   }
-  const popularArtists = Array.from(artistMap.values()).slice(0, 20);
+  const popularArtists = Array.from(artistMap.values()).slice(0, 15);
 
   // Group by genre
   const sections: Record<string, Track[]> = {};
@@ -123,27 +111,27 @@ export default async function MusicPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold">🎵 Music</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Curated Nigerian tracks by genre — 30‑second previews from iTunes.
+          Curated Nigerian tracks — 30‑second previews.
         </p>
       </div>
 
       {/* Popular Artists (circular) */}
       {popularArtists.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Artists</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
+        <section className="mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Popular Artists</h2>
+          <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 snap-x">
             {popularArtists.map((artist) => (
               <div key={artist.name} className="snap-start flex-shrink-0">
-                <div className="flex flex-col items-center gap-2 w-20">
+                <div className="flex flex-col items-center gap-1.5 w-16">
                   <a href={artist.link} className="block">
-                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-500 transition">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-500 transition">
                       <img src={artist.imageUrl} alt={artist.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </a>
-                  <span className="text-xs text-center text-gray-700 line-clamp-2 leading-tight">
+                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">
                     {artist.name}
                   </span>
                 </div>
@@ -153,10 +141,10 @@ export default async function MusicPage() {
         </section>
       )}
 
-      {/* Genre sections */}
+      {/* Genre sections (limit 10 per section) */}
       {orderedSections.map((sectionName) => {
         const tracks = sections[sectionName] || [];
-        return <TrackRow key={sectionName} title={sectionName} tracks={tracks} />;
+        return <TrackRow key={sectionName} title={sectionName} tracks={tracks} max={10} />;
       })}
     </div>
   );
