@@ -20,7 +20,7 @@ export default function MusicCard({ track }: { track: MusicTrack }) {
   const cover = track.cover_image_url || getFallbackCover(track.slug);
   return (
     <article className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden">
-      <img src={cover} alt={track.title} className="w-full h-32 sm:h-40 object-cover" />
+      <img src={cover} alt={track.title} className="w-full h-32 sm:h-40 object-cover" loading="lazy" />
       <div className="p-3">
         <h2 className="text-sm font-semibold line-clamp-2">{track.title}</h2>
         {track.artist && <p className="text-xs text-gray-500 mt-1">{track.artist}</p>}
@@ -32,7 +32,7 @@ export default function MusicCard({ track }: { track: MusicTrack }) {
           rel="noopener noreferrer"
           className="inline-block mt-2 text-green-700 text-xs font-medium hover:underline"
         >
-          Listen/Read →
+          Read →
         </a>
       </div>
     </article>

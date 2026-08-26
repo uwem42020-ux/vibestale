@@ -19,12 +19,15 @@ function generateSlug(title: string): string {
 
 export async function ingestMusic() {
   const supabase = await createClient();
+
   const { data: sources } = await supabase
     .from('music_sources')
     .select('*')
     .eq('is_active', true);
 
-  if (!sources || sources.length === 0) return { processed: 0, errors: 0 };
+  if (!sources || sources.length === 0) {
+    return { processed: 0, errors: 0 };
+  }
 
   let processed = 0;
   let errors = 0;
@@ -32,12 +35,20 @@ export async function ingestMusic() {
   for (const source of sources) {
     try {
       const feed = await parser.parseURL(source.rss_url);
+
       for (const item of feed.items.slice(0, 5)) {
         const title = item.title?.trim();
         const link = item.link;
         const pubDate = item.pubDate;
 
         if (!title || !link) continue;
+
+        // Extract image URL from RSS (enclosure/media content)
+        const imageUrl =
+          item.enclosure?.url ||
+          (item as any)['media:content']?.url ||
+          (item as any)['media:thumbnail']?.url ||
+          null;
 
         const slug = generateSlug(title);
         const { data: existing } = await supabase
@@ -54,6 +65,7 @@ export async function ingestMusic() {
           slug,
           release_date: pubDate ? new Date(pubDate).toISOString() : null,
           ai_analysis_status: 'pending',
+          cover_image_url: imageUrl, // <-- added
         });
 
         if (error) {
@@ -68,11 +80,31 @@ export async function ingestMusic() {
         .from('music_sources')
         .update({ last_fetched: new Date().toISOString(), fetch_errors: 0 })
         .eq('id', source.id);
+
     } catch (error) {
       console.error(`Failed to fetch ${source.name}:`, error);
       errors++;
-      await supabase.rpc('increment_music_source_errors', { source_id: source.id });
+
+      // Direct SQL update for error count (no RPC needed)
+      const { data: currentSource } = await supabase
+        .from('music_sources')
+        .select('fetch_errors')
+        .eq('id', source.id)
+        .single();
+
+      const newErrorCount = (currentSource?.fetch_errors || 0) + 1;
+      const shouldDisable = newErrorCount >= 3;
+
+      await supabase
+        .from('music_sources')
+        .update({ fetch_errors: newErrorCount, is_active: !shouldDisable })
+        .eq('id', source.id);
+
+      if (shouldDisable) {
+        console.warn(`Music source ${source.name} disabled after 3 consecutive errors.`);
+      }
     }
   }
+
   return { processed, errors };
 }
