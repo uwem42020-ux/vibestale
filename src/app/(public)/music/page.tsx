@@ -82,12 +82,15 @@ export default async function MusicPage() {
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
   const allTracks = results.flat();
 
-  // Unique tracks
+  // Filter to only tracks with a preview URL
+  const playableTracks = allTracks.filter((track) => track.previewUrl);
+
+  // Remove duplicates (by track name + artist)
   const uniqueTracks = Array.from(
-    new Map(allTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
+    new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  // Build circular artist list (use first track's artwork for each artist)
+  // Build circular artist list from playable tracks only
   const artistMap = new Map<string, Artist>();
   for (const track of uniqueTracks) {
     if (!artistMap.has(track.artistName)) {
@@ -100,7 +103,7 @@ export default async function MusicPage() {
   }
   const popularArtists = Array.from(artistMap.values()).slice(0, 20);
 
-  // Group tracks by genre
+  // Group by genre
   const sections: Record<string, Track[]> = {};
   for (const track of uniqueTracks) {
     const genre = getGenre(track.primaryGenreName);
@@ -134,7 +137,6 @@ export default async function MusicPage() {
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
             {popularArtists.map((artist) => (
               <div key={artist.name} className="snap-start flex-shrink-0">
-                {/* ArtistCircle */}
                 <div className="flex flex-col items-center gap-2 w-20">
                   <a href={artist.link} className="block">
                     <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-500 transition">
