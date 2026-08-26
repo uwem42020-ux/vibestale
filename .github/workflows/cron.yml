@@ -37,3 +37,11 @@ jobs:
         run: |
           curl -X GET https://vibestale3.vercel.app/api/cron/music-analysis \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+  youtube-search:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call YouTube search endpoint
+        run: |
+          curl -X GET https://vibestale3.vercel.app/api/cron/youtube-search \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

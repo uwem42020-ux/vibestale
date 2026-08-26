@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import TrackRow from '@/components/music/TrackRow';
 
 export const dynamic = 'force-dynamic';
@@ -25,12 +26,7 @@ type Track = {
   trackViewUrl: string;
   collectionName?: string;
   primaryGenreName?: string;
-};
-
-type Artist = {
-  name: string;
-  imageUrl: string;
-  link: string;
+  youtubeVideoId?: string;
 };
 
 async function fetchArtistTracks(artist: string): Promise<Track[]> {
@@ -42,8 +38,7 @@ async function fetchArtistTracks(artist: string): Promise<Track[]> {
     if (!response.ok) return [];
     const data = await response.json();
     return data.results || [];
-  } catch (error) {
-    console.error(`Failed to fetch tracks for ${artist}:`, error);
+  } catch {
     return [];
   }
 }
@@ -61,17 +56,33 @@ function getGenre(primaryGenreName?: string): string {
 }
 
 export default async function MusicPage() {
+  const supabase = await createClient();
+
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
-  const allTracks = results.flat();
-
-  const playableTracks = allTracks.filter((track) => track.previewUrl);
-
+  const playableTracks = results.flat().filter((track) => track.previewUrl);
   const uniqueTracks = Array.from(
     new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  const artistMap = new Map<string, Artist>();
-  for (const track of uniqueTracks) {
+  const { data: youtubeVideos } = await supabase
+    .from('youtube_videos')
+    .select('title, artist, youtube_video_id');
+
+  const youtubeMap = new Map<string, string>();
+  if (youtubeVideos) {
+    for (const video of youtubeVideos) {
+      const key = `${video.title.toLowerCase()}-${video.artist.toLowerCase()}`;
+      youtubeMap.set(key, video.youtube_video_id);
+    }
+  }
+
+  const tracksWithYouTube = uniqueTracks.map((track) => {
+    const key = `${track.trackName.toLowerCase()}-${track.artistName.toLowerCase()}`;
+    return { ...track, youtubeVideoId: youtubeMap.get(key) };
+  });
+
+  const artistMap = new Map<string, { name: string; imageUrl: string; link: string }>();
+  for (const track of tracksWithYouTube) {
     if (!artistMap.has(track.artistName)) {
       artistMap.set(track.artistName, {
         name: track.artistName,
@@ -83,7 +94,7 @@ export default async function MusicPage() {
   const popularArtists = Array.from(artistMap.values()).slice(0, 15);
 
   const sections: Record<string, Track[]> = {};
-  for (const track of uniqueTracks) {
+  for (const track of tracksWithYouTube) {
     const genre = getGenre(track.primaryGenreName);
     if (!sections[genre]) sections[genre] = [];
     sections[genre].push(track);
@@ -105,13 +116,10 @@ export default async function MusicPage() {
         <div>
           <h1 className="text-3xl font-bold">🎵 Music</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Curated Nigerian tracks — 30‑second previews.
+            Curated Nigerian tracks — 30‑second previews, with full song links.
           </p>
         </div>
-        <Link
-          href="/music-news"
-          className="text-sm text-green-700 hover:underline whitespace-nowrap"
-        >
+        <Link href="/music-news" className="text-sm text-green-700 hover:underline whitespace-nowrap">
           Music News →
         </Link>
       </div>

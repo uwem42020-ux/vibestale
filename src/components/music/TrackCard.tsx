@@ -10,6 +10,7 @@ type Track = {
   trackViewUrl: string;
   collectionName?: string;
   primaryGenreName?: string;
+  youtubeVideoId?: string;
 };
 
 export default function TrackCard({ track }: { track: Track }) {
@@ -25,6 +26,10 @@ export default function TrackCard({ track }: { track: Track }) {
       playTrack(track);
     }
   };
+
+  const youtubeUrl = track.youtubeVideoId
+    ? `https://www.youtube.com/watch?v=${track.youtubeVideoId}`
+    : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.artistName} ${track.trackName}`)}`;
 
   return (
     <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden flex flex-col w-36 sm:w-44">
@@ -54,14 +59,23 @@ export default function TrackCard({ track }: { track: Track }) {
       <div className="p-2.5 flex flex-col flex-1">
         <h3 className="text-xs font-semibold text-gray-900 line-clamp-1">{track.trackName}</h3>
         <p className="text-[11px] text-gray-600 mt-0.5 line-clamp-1">{track.artistName}</p>
-        <div className="mt-auto pt-2">
+
+        <div className="mt-auto pt-2 flex items-center justify-between">
+          <a
+            href={youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-red-600 text-[10px] font-medium hover:underline"
+          >
+            ▶ Full Song
+          </a>
           <a
             href={track.trackViewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-green-700 text-[10px] font-medium hover:underline"
           >
-            Open ↗
+            iTunes ↗
           </a>
         </div>
       </div>
