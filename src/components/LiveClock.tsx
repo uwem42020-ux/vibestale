@@ -20,12 +20,12 @@ export default function LiveClock() {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true,          // <-- changed to true for 12-hour format
+    hour12: true,
     timeZone: 'Africa/Lagos',
   }).format(now);
 
   return (
-    <div className="text-xs text-gray-500 flex items-center gap-1">
+    <div className="text-xs text-gray-300 flex items-center gap-1">
       <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse" />
       {formatted} WAT
     </div>

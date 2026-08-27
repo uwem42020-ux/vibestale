@@ -11,23 +11,23 @@ export default function PublicLayout({
 }) {
   return (
     <AudioProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="min-h-screen flex flex-col bg-black">
+        <header className="bg-black border-b border-gray-800 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold text-green-700">
+            <Link href="/" className="text-2xl font-bold text-green-500">
               VibeStale
             </Link>
             <div className="flex items-center gap-3">
               <LiveClock />
               <nav className="hidden md:flex space-x-4 text-sm">
-                <Link href="/" className="hover:text-green-700">Home</Link>
-                <Link href="/category/general" className="hover:text-green-700">General</Link>
-                <Link href="/category/tech" className="hover:text-green-700">Tech</Link>
-                <Link href="/category/business" className="hover:text-green-700">Business</Link>
-                <Link href="/category/sports" className="hover:text-green-700">Sports</Link>
-                <Link href="/category/entertainment" className="hover:text-green-700">Entertainment</Link>
-                <Link href="/media" className="hover:text-green-700">Media</Link>
-                <Link href="/music" className="hover:text-green-700">Music</Link>
+                <Link href="/" className="text-gray-300 hover:text-white">Home</Link>
+                <Link href="/category/general" className="text-gray-300 hover:text-white">General</Link>
+                <Link href="/category/tech" className="text-gray-300 hover:text-white">Tech</Link>
+                <Link href="/category/business" className="text-gray-300 hover:text-white">Business</Link>
+                <Link href="/category/sports" className="text-gray-300 hover:text-white">Sports</Link>
+                <Link href="/category/entertainment" className="text-gray-300 hover:text-white">Entertainment</Link>
+                <Link href="/media" className="text-gray-300 hover:text-white">Media</Link>
+                <Link href="/music" className="text-gray-300 hover:text-white">Music</Link>
               </nav>
             </div>
           </div>
@@ -37,7 +37,7 @@ export default function PublicLayout({
           {children}
         </main>
 
-        <footer className="bg-white border-t py-4 text-center text-sm text-gray-500 hidden md:block">
+        <footer className="bg-black border-t border-gray-800 py-4 text-center text-sm text-gray-400 hidden md:block">
           <p>© {new Date().getFullYear()} VibeStale — AI-powered Nigerian news intelligence</p>
         </footer>
 

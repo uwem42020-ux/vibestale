@@ -36,11 +36,8 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
   const fallbackImage = `https://picsum.photos/seed/${headline.slug}/200/200`;
 
   return (
-    <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 flex gap-3 items-start">
-      <Link
-        href={`/headline/${headline.slug}`}
-        className="flex-shrink-0"
-      >
+    <article className="bg-gray-900 rounded-xl shadow-sm hover:shadow-md transition p-3 flex gap-3 items-start">
+      <Link href={`/headline/${headline.slug}`} className="flex-shrink-0">
         <img
           src={headline.image_url || fallbackImage}
           alt={headline.title}
@@ -50,7 +47,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
       </Link>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
           {headline.sources && (
             <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
           )}
@@ -59,14 +56,14 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
         </div>
 
         <Link href={`/headline/${headline.slug}`}>
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-snug line-clamp-2 hover:text-green-700">
+          <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-2 hover:text-green-400">
             {headline.title}
           </h3>
         </Link>
 
         {headline.ai_summary && (
-          <p className="mt-1 text-xs text-gray-600 line-clamp-2">
-            <span className="inline-block bg-green-100 text-green-800 text-[9px] px-1.5 py-0.5 rounded mr-1 align-middle">
+          <p className="mt-1 text-xs text-gray-300 line-clamp-2">
+            <span className="inline-block bg-green-900 text-green-200 text-[9px] px-1.5 py-0.5 rounded mr-1 align-middle">
               AI
             </span>
             {headline.ai_summary}
@@ -78,7 +75,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
             href={headline.original_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-700 text-xs font-medium hover:underline"
+            className="text-green-500 text-xs font-medium hover:underline"
           >
             Read →
           </a>

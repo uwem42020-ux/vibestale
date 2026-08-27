@@ -11,7 +11,7 @@ export default function SourceBadge({ name, baseUrl }: SourceBadgeProps) {
     : null;
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-gray-600">
+    <span className="inline-flex items-center gap-1.5 text-xs text-gray-300">
       {faviconUrl && (
         <img src={faviconUrl} alt={name} className="w-4 h-4 rounded-sm" loading="lazy" />
       )}

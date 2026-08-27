@@ -34,7 +34,7 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
   const fallbackImage = `https://picsum.photos/seed/${headline.slug}/800/450`;
 
   return (
-    <article className="bg-white rounded-2xl shadow-md overflow-hidden">
+    <article className="bg-gray-900 rounded-2xl shadow-md overflow-hidden">
       <Link href={`/headline/${headline.slug}`} className="block">
         <img
           src={headline.image_url || fallbackImage}
@@ -44,7 +44,7 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
         />
       </Link>
       <div className="p-4">
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
           {headline.sources && (
             <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
           )}
@@ -52,13 +52,13 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
           <span>{timeAgo(headline.published_at)}</span>
         </div>
         <Link href={`/headline/${headline.slug}`}>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug hover:text-green-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-white leading-snug hover:text-green-400">
             {headline.title}
           </h2>
         </Link>
         {headline.ai_summary && (
-          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
-            <span className="inline-block bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded mr-1">
+          <p className="mt-2 text-sm text-gray-300 line-clamp-3">
+            <span className="inline-block bg-green-900 text-green-200 text-xs px-1.5 py-0.5 rounded mr-1">
               AI
             </span>
             {headline.ai_summary}
@@ -69,7 +69,7 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
             href={headline.original_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-700 text-sm font-medium hover:underline"
+            className="text-green-500 text-sm font-medium hover:underline"
           >
             Read Full Story →
           </a>
