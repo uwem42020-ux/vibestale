@@ -60,15 +60,30 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
       {
         role: 'system',
         content:
-          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Always respond in valid JSON with keys: summary, sentiment, key_entities, confidence_score, category. Category must be one of: politics, business, sports, tech, entertainment, general.',
+          'You are a senior Nigerian news analyst for VibeStale, a platform that explains the news with clarity and depth. ' +
+          'Given a headline, write a rich, 4-5 sentence analysis that:\n' +
+          '- Provides necessary context and background\n' +
+          '- Identifies key people, organisations, and places involved\n' +
+          '- Explains why the story matters to Nigerians (economic, political, social, or cultural impact)\n' +
+          '- Is neutral, factual, and free of speculation or opinion\n' +
+          '- Avoids repeating the headline\n\n' +
+          'Return ONLY valid JSON in this exact format:\n' +
+          '{\n' +
+          '  "summary": "your 4-5 sentence analysis",\n' +
+          '  "sentiment": "positive" | "negative" | "neutral",\n' +
+          '  "key_entities": ["Name1", "Place1", "Organisation1"],\n' +
+          '  "confidence_score": 0.85,\n' +
+          '  "category": "politics" | "business" | "sports" | "tech" | "entertainment" | "general"\n' +
+          '}\n\n' +
+          'Keep the summary engaging and informative, as if written by a knowledgeable journalist.',
       },
       {
         role: 'user',
-        content: `Analyze this Nigerian news headline and provide context. Headline: "${title}"`,
+        content: `Headline: "${title}"\n\nAnalyse it and return the JSON.`,
       },
     ],
     response_format: { type: 'json_object' },
-    max_tokens: 250,
+    max_tokens: 400,
   });
 
   const content = completion.choices[0].message.content;
@@ -93,7 +108,8 @@ async function generateWithOpenRouter(
       {
         role: 'system',
         content:
-          'You are a Nigerian news analyst for VibeStale. Provide concise, neutral analysis. Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics"}',
+          'You are a Nigerian news analyst for VibeStale. Provide a concise, neutral, 4-5 sentence analysis. ' +
+          'Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics"}',
       },
       {
         role: 'user',
