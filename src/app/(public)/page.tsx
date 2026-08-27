@@ -1,16 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import HeadlineCard from '@/components/feed/HeadlineCard';
+import FeaturedHeadlineCard from '@/components/feed/FeaturedHeadlineCard';
 
 export const dynamic = 'force-dynamic';
-
-const categories = [
-  { slug: 'general', label: 'General' },
-  { slug: 'politics', label: 'Politics' },
-  { slug: 'business', label: 'Business' },
-  { slug: 'sports', label: 'Sports' },
-  { slug: 'tech', label: 'Tech' },
-  { slug: 'entertainment', label: 'Entertainment' },
-];
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -22,39 +14,33 @@ export default async function HomePage() {
     .eq('status', 'published')
     .is('deleted_at', null)
     .order('published_at', { ascending: false })
-    .limit(50);
+    .limit(20);
 
   if (error) {
     console.error('Error fetching headlines:', error);
     return <div>Error loading headlines.</div>;
   }
 
+  if (!headlines || headlines.length === 0) {
+    return <div>No headlines yet.</div>;
+  }
+
+  const [featured, ...rest] = headlines;
+
   return (
     <div>
-      <div className="mb-5 overflow-x-auto -mx-4 px-4 flex gap-2 md:hidden">
-        {categories.map((cat) => (
-          <a
-            key={cat.slug}
-            href={`/category/${cat.slug}`}
-            className="flex-shrink-0 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-green-50 hover:border-green-300"
-          >
-            {cat.label}
-          </a>
-        ))}
-      </div>
-
       <h1 className="text-3xl font-bold mb-6 hidden md:block">Latest News with AI Context</h1>
       <h2 className="text-2xl font-bold mb-4 md:hidden">Top Stories</h2>
 
-      {headlines.length === 0 ? (
-        <p>No headlines yet.</p>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {headlines.map((headline) => (
-            <HeadlineCard key={headline.id} headline={headline} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-4">
+        {/* Featured story */}
+        <FeaturedHeadlineCard headline={featured} />
+
+        {/* Other headlines */}
+        {rest.map((headline) => (
+          <HeadlineCard key={headline.id} headline={headline} />
+        ))}
+      </div>
     </div>
   );
 }

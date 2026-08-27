@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import SourceBadge from '@/components/SourceBadge';
 import WhatsAppShare from '@/components/share/WhatsAppShare';
@@ -30,57 +28,50 @@ function timeAgo(dateString: string | null): string {
   return new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }
 
-export default function HeadlineCard({ headline }: { headline: Headline }) {
+export default function FeaturedHeadlineCard({ headline }: { headline: Headline }) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
-  const fallbackImage = `https://picsum.photos/seed/${headline.slug}/200/200`;
+  const fallbackImage = `https://picsum.photos/seed/${headline.slug}/800/450`;
 
   return (
-    <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 flex gap-3 items-start">
-      <Link
-        href={`/headline/${headline.slug}`}
-        className="flex-shrink-0"
-      >
+    <article className="bg-white rounded-2xl shadow-md overflow-hidden">
+      <Link href={`/headline/${headline.slug}`} className="block">
         <img
           src={headline.image_url || fallbackImage}
           alt={headline.title}
-          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+          className="w-full h-56 sm:h-72 object-cover"
           loading="lazy"
         />
       </Link>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
           {headline.sources && (
             <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
           )}
           <span>·</span>
           <span>{timeAgo(headline.published_at)}</span>
         </div>
-
         <Link href={`/headline/${headline.slug}`}>
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-snug line-clamp-2 hover:text-green-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug hover:text-green-700">
             {headline.title}
-          </h3>
+          </h2>
         </Link>
-
         {headline.ai_summary && (
-          <p className="mt-1 text-xs text-gray-600 line-clamp-2">
-            <span className="inline-block bg-green-100 text-green-800 text-[9px] px-1.5 py-0.5 rounded mr-1 align-middle">
+          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+            <span className="inline-block bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded mr-1">
               AI
             </span>
             {headline.ai_summary}
           </p>
         )}
-
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <a
             href={headline.original_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-700 text-xs font-medium hover:underline"
+            className="text-green-700 text-sm font-medium hover:underline"
           >
-            Read →
+            Read Full Story →
           </a>
           <WhatsAppShare title={headline.title} url={shareUrl} />
         </div>
