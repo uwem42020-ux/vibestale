@@ -34,6 +34,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const playTrack = (track: Track) => {
     if (!track.previewUrl) return;
 
+    // Notify all VideoCards to stop playing
+    window.dispatchEvent(new Event('vibestale:audio-play'));
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = track.previewUrl;
@@ -67,6 +70,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      // Notify videos to stop
+      window.dispatchEvent(new Event('vibestale:audio-play'));
       audioRef.current.play();
       setIsPlaying(true);
     }

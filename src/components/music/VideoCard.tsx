@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAudio } from './AudioProvider';
 
 type Video = {
   id: string;
@@ -10,30 +11,63 @@ type Video = {
   thumbnail_url: string | null;
 };
 
-export default function VideoCard({ video }: { video: Video }) {
+type VideoCardProps = {
+  video: Video;
+};
+
+export default function VideoCard({ video }: VideoCardProps) {
   const [playing, setPlaying] = useState(false);
+  const { closePlayer } = useAudio();
 
   const thumbnail =
     video.thumbnail_url ||
     `https://img.youtube.com/vi/${video.youtube_video_id}/hqdefault.jpg`;
 
+  // Stop this video if audio starts or another video is played
+  useEffect(() => {
+    const stop = () => setPlaying(false);
+    const handleVideoPlay = (e: Event) => {
+      const custom = e as CustomEvent<{ id: string }>;
+      if (custom.detail?.id !== video.id) setPlaying(false);
+    };
+
+    window.addEventListener('vibestale:audio-play', stop);
+    window.addEventListener('vibestale:video-play', handleVideoPlay as EventListener);
+
+    return () => {
+      window.removeEventListener('vibestale:audio-play', stop);
+      window.removeEventListener('vibestale:video-play', handleVideoPlay as EventListener);
+    };
+  }, [video.id]);
+
+  const handlePlay = () => {
+    // Stop any playing audio preview
+    closePlayer();
+
+    // Notify other videos to stop
+    window.dispatchEvent(
+      new CustomEvent('vibestale:video-play', { detail: { id: video.id } })
+    );
+
+    setPlaying(true);
+  };
+
   return (
     <article className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden w-64 flex-shrink-0">
       {playing ? (
-        <div className="aspect-video">
+        <div className="relative aspect-video">
           <iframe
-            width="100%"
-            height="100%"
             src={`https://www.youtube-nocookie.com/embed/${video.youtube_video_id}?autoplay=1&rel=0`}
             title={video.title}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
+            className="absolute inset-0 w-full h-full"
           />
         </div>
       ) : (
         <button
-          onClick={() => setPlaying(true)}
+          onClick={handlePlay}
           className="relative block w-full aspect-video bg-gray-100"
         >
           <img

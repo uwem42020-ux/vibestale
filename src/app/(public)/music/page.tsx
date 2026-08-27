@@ -2,22 +2,9 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import TrackRow from '@/components/music/TrackRow';
 import VideoCard from '@/components/music/VideoCard';
+import { ARTISTS } from '@/lib/artists';
 
 export const dynamic = 'force-dynamic';
-
-const ARTISTS = [
-  'Burna Boy', 'Wizkid', 'Davido', 'Tiwa Savage', 'Asake', 'Rema',
-  'Ayra Starr', 'Fireboy DML', 'Omah Lay', 'Tems', 'Kizz Daniel',
-  'BNXN', 'Ruger', 'Ckay', 'Joeboy', 'Lojay', 'Victony',
-  'Bella Shmurda', 'Zinoleesky', 'Shallipopi', 'Odumodublvck',
-  'Qing Madi', 'Llona', 'Ayo Maff', 'Fave',
-  '2Baba', 'D\'banj', 'P-Square', 'Flavour', 'Olamide', 'Yemi Alade', 'Simi',
-  'Sinach', 'Mercy Chinwo', 'Nathaniel Bassey', 'Joe Praize',
-  'Falz', 'Ladipoe', 'Blaqbonez', 'Ycee',
-  'Tay Iwar', 'Nonso Amadi', 'Amaarae', 'Wurld',
-  'Naira Marley', 'Lil Kesh', '9ice',
-  'Patoranking', 'Runtown', 'Skales'
-];
 
 type Track = {
   trackName: string;
@@ -28,6 +15,11 @@ type Track = {
   collectionName?: string;
   primaryGenreName?: string;
   youtubeVideoId?: string;
+};
+
+type PopularArtist = {
+  name: string;
+  imageUrl: string | null;
 };
 
 async function fetchArtistTracks(artist: string): Promise<Track[]> {
@@ -42,6 +34,12 @@ async function fetchArtistTracks(artist: string): Promise<Track[]> {
   } catch {
     return [];
   }
+}
+
+// Fetch a profile image for an artist (from first track's artwork)
+async function fetchArtistImage(artist: string): Promise<string | null> {
+  const tracks = await fetchArtistTracks(artist);
+  return tracks[0]?.artworkUrl100 || null;
 }
 
 function getGenre(primaryGenreName?: string): string {
@@ -59,7 +57,7 @@ function getGenre(primaryGenreName?: string): string {
 export default async function MusicPage() {
   const supabase = await createClient();
 
-  // Fetch iTunes tracks
+  // ========== 1. Fetch iTunes tracks for all artists (for genre sections) ==========
   const results = await Promise.all(ARTISTS.map(fetchArtistTracks));
   const allTracks = results.flat();
   const playableTracks = allTracks.filter((track) => track.previewUrl);
@@ -67,14 +65,14 @@ export default async function MusicPage() {
     new Map(playableTracks.map((track) => [`${track.trackName}-${track.artistName}`, track])).values()
   );
 
-  // Fetch YouTube videos
+  // ========== 2. Fetch YouTube videos ==========
   const { data: youtubeVideos } = await supabase
     .from('youtube_videos')
     .select('id, title, artist, youtube_video_id, thumbnail_url')
     .order('created_at', { ascending: false })
     .limit(20);
 
-  // Map YouTube IDs to tracks
+  // Map YouTube IDs to tracks (for audio tracks if needed)
   const youtubeMap = new Map<string, string>();
   if (youtubeVideos) {
     for (const video of youtubeVideos) {
@@ -88,20 +86,20 @@ export default async function MusicPage() {
     return { ...track, youtubeVideoId: youtubeMap.get(key) };
   });
 
-  // Build popular artists
-  const artistMap = new Map<string, { name: string; imageUrl: string; link: string }>();
-  for (const track of tracksWithYouTube) {
-    if (!artistMap.has(track.artistName)) {
-      artistMap.set(track.artistName, {
-        name: track.artistName,
-        imageUrl: track.artworkUrl100?.replace('100x100', '300x300') || '/placeholder.png',
-        link: track.trackViewUrl,
-      });
-    }
-  }
-  const popularArtists = Array.from(artistMap.values()).slice(0, 15);
+  // ========== 3. Build Popular Artists directly from ARTISTS ==========
+  // Remove duplicates while preserving order
+  const uniqueArtists = Array.from(new Set(ARTISTS));
+  const popularArtistNames = uniqueArtists.slice(0, 20); // show first 20
 
-  // Group audio tracks by genre
+  // Fetch image for each popular artist in parallel
+  const popularArtists: PopularArtist[] = await Promise.all(
+    popularArtistNames.map(async (name) => ({
+      name,
+      imageUrl: await fetchArtistImage(name),
+    }))
+  );
+
+  // ========== 4. Group audio tracks by genre ==========
   const sections: Record<string, Track[]> = {};
   for (const track of tracksWithYouTube) {
     const genre = getGenre(track.primaryGenreName);
@@ -133,7 +131,40 @@ export default async function MusicPage() {
         </Link>
       </div>
 
-      {/* Music Videos Section */}
+      {/* ========== Popular Artists (from ARTISTS list) ========== */}
+      {popularArtists.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Artists</h2>
+          <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 snap-x">
+            {popularArtists.map((artist) => (
+              <div key={artist.name} className="snap-start flex-shrink-0">
+                <Link
+                  href={`/artist/${encodeURIComponent(artist.name)}`}
+                  className="flex flex-col items-center gap-1.5 w-16"
+                >
+                  {artist.imageUrl ? (
+                    <img
+                      src={artist.imageUrl.replace('100x100', '300x300')}
+                      alt={artist.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 hover:border-green-500 transition"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-500">
+                      {artist.name.charAt(0)}
+                    </div>
+                  )}
+                  <span className="text-[10px] text-center text-gray-700 line-clamp-2 leading-tight max-w-[64px]">
+                    {artist.name}
+                  </span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ========== Music Videos ========== */}
       {youtubeVideos && youtubeVideos.length > 0 && (
         <section className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3">🎬 Music Videos</h2>
@@ -147,30 +178,7 @@ export default async function MusicPage() {
         </section>
       )}
 
-      {/* Popular Artists */}
-      {popularArtists.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Artists</h2>
-          <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 snap-x">
-            {popularArtists.map((artist) => (
-              <div key={artist.name} className="snap-start flex-shrink-0">
-                <div className="flex flex-col items-center gap-1.5 w-16">
-                  <a href={artist.link} className="block">
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 hover:border-green-500 transition">
-                      <img src={artist.imageUrl} alt={artist.name} className="w-full h-full object-cover" loading="lazy" />
-                    </div>
-                  </a>
-                  <span className="text-[10px] text-center text-gray-700 line-clamp-1 leading-tight max-w-[64px]">
-                    {artist.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Audio Track Sections */}
+      {/* ========== Audio Track Sections ========== */}
       {orderedSections.map((sectionName) => {
         const tracks = sections[sectionName] || [];
         return <TrackRow key={sectionName} title={sectionName} tracks={tracks} max={10} />;
