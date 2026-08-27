@@ -11,7 +11,7 @@ export default function BottomNav() {
     { href: '/category/general', label: 'General', icon: '📰' },
     { href: '/category/tech', label: 'Tech', icon: '💻' },
     { href: '/category/sports', label: 'Sports', icon: '⚽' },
-    { href: '/category/entertainment', label: 'Entertainment', icon: '🎬' },
+    { href: '/media', label: 'Media', icon: '🎬' },
     { href: '/music', label: 'Music', icon: '🎵' },
   ];
 

@@ -26,6 +26,7 @@ export default function PublicLayout({
                 <Link href="/category/business" className="hover:text-green-700">Business</Link>
                 <Link href="/category/sports" className="hover:text-green-700">Sports</Link>
                 <Link href="/category/entertainment" className="hover:text-green-700">Entertainment</Link>
+                <Link href="/media" className="hover:text-green-700">Media</Link>
                 <Link href="/music" className="hover:text-green-700">Music</Link>
               </nav>
             </div>
