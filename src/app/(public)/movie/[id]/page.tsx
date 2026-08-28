@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { searchYouTube } from '@/lib/youtube/search';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,25 +31,6 @@ async function fetchMovie(id: string): Promise<MovieDetail | null> {
   }
 }
 
-async function searchYouTube(query: string): Promise<string | null> {
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return null;
-  const url = new URL('https://www.googleapis.com/youtube/v3/search');
-  url.searchParams.set('part', 'snippet');
-  url.searchParams.set('q', query);
-  url.searchParams.set('type', 'video');
-  url.searchParams.set('maxResults', '1');
-  url.searchParams.set('key', apiKey);
-  try {
-    const response = await fetch(url.toString());
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.items?.[0]?.id?.videoId || null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function MoviePage({ params }: Props) {
   const { id } = await params;
   const movie = await fetchMovie(id);
@@ -59,7 +41,21 @@ export default async function MoviePage({ params }: Props) {
   );
   const trailerId = trailer?.key || null;
 
-  const fullMovieId = await searchYouTube(`${movie.title} full movie official`);
+  // Try multiple search queries for full movie
+  const queries = [
+    `${movie.title} full movie official`,
+    `${movie.title} Nollywood full movie`,
+    `${movie.title} full movie`,
+  ];
+
+  let fullMovieId: string | null = null;
+  for (const q of queries) {
+    const results = await searchYouTube(q, 1);
+    if (results.length > 0) {
+      fullMovieId = results[0].videoId;
+      break;
+    }
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -68,31 +64,31 @@ export default async function MoviePage({ params }: Props) {
           <img
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
             alt={movie.title}
-            className="w-48 rounded-xl shadow"
+            className="w-48 rounded-xl shadow bg-gray-800"
           />
         ) : (
-          <div className="w-48 h-72 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400">
+          <div className="w-48 h-72 bg-gray-800 rounded-xl flex items-center justify-center text-gray-500">
             No Image
           </div>
         )}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">{movie.title}</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">{movie.title}</h1>
+          <p className="text-sm text-gray-400 mt-1">
             {movie.release_date?.substring(0, 4)} · ⭐ {movie.vote_average?.toFixed(1)}
           </p>
           <div className="flex flex-wrap gap-2 mt-2">
             {movie.genres?.map((g) => (
-              <span key={g.name} className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+              <span key={g.name} className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full">
                 {g.name}
               </span>
             ))}
           </div>
-          <p className="text-sm text-gray-700 mt-4">{movie.overview}</p>
+          <p className="text-sm text-gray-300 mt-4">{movie.overview}</p>
 
           {trailerId && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-2">Trailer</h2>
-              <div className="aspect-video max-w-xl">
+              <h2 className="text-lg font-semibold text-white mb-2">Trailer</h2>
+              <div className="aspect-video max-w-xl bg-black rounded-xl overflow-hidden">
                 <iframe
                   width="100%"
                   height="100%"
@@ -108,8 +104,8 @@ export default async function MoviePage({ params }: Props) {
 
           {fullMovieId && (
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-2">Full Movie</h2>
-              <div className="aspect-video max-w-xl">
+              <h2 className="text-lg font-semibold text-white mb-2">Full Movie</h2>
+              <div className="aspect-video max-w-xl bg-black rounded-xl overflow-hidden">
                 <iframe
                   width="100%"
                   height="100%"
