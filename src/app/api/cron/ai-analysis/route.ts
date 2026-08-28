@@ -12,12 +12,12 @@ export async function GET(req: Request) {
 
   const supabase = await createClient();
 
-  // Get pending headlines (limit 5 per run to avoid timeout)
+  // Get newest pending headlines first (descending order)
   const { data: pending, error: fetchError } = await supabase
     .from('headlines')
     .select('id, title')
     .eq('ai_analysis_status', 'pending')
-    .order('fetched_at', { ascending: true })
+    .order('fetched_at', { ascending: false })  // newest first
     .limit(5);
 
   if (fetchError || !pending || pending.length === 0) {
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   for (const headline of pending) {
     try {
       const analysis = await generateCommentary(headline.title);
-      const imageUrl = matchImage(headline.title); // optional image matching
+      const imageUrl = matchImage(headline.title);
 
       const { error: updateError } = await supabase
         .from('headlines')
