@@ -47,17 +47,21 @@ export default async function MoviesPage() {
   }
 
   const [nollywood, foreign, nowPlaying, topRated] = await Promise.all([
+    // Nollywood: origin country Nigeria
     fetchMovies(
       `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
     ),
+    // Foreign: Top Rated (distinct from now playing)
     fetchMovies(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=1`
+      `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
     ),
+    // Now Playing
     fetchMovies(
       `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&page=1`
     ),
+    // Top Rated (extra section)
     fetchMovies(
-      `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
+      `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=1`
     ),
   ]);
 
@@ -68,9 +72,9 @@ export default async function MoviesPage() {
       <h1 className="text-3xl font-bold mb-6 text-white">🎬 Movies</h1>
 
       <MovieSection title="🇳🇬 Nollywood" movies={nollywood} />
-      <MovieSection title="🌍 Foreign" movies={foreign} />
+      <MovieSection title="🌍 Foreign Top Rated" movies={foreign} />
       <MovieSection title="🆕 Now Playing" movies={nowPlaying} />
-      <MovieSection title="⭐ Top Rated" movies={topRated} />
+      <MovieSection title="🔥 Popular International" movies={topRated} />
 
       {/* YouTube Full Movies Section */}
       {youtubeMovies.length > 0 && (
@@ -125,8 +129,9 @@ function MovieSection({ title, movies }: { title: string; movies: Movie[] }) {
                 loading="lazy"
               />
             ) : (
-              <div className="w-full aspect-[2/3] bg-gray-800 flex items-center justify-center text-gray-500">
-                No Image
+              <div className="w-full aspect-[2/3] bg-gray-800 flex flex-col items-center justify-center text-gray-500">
+                <span className="text-2xl">🎬</span>
+                <span className="text-xs mt-2 px-2 text-center line-clamp-2">{movie.title}</span>
               </div>
             )}
             <div className="p-2">
