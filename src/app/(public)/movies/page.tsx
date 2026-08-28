@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { searchYouTube } from '@/lib/youtube/search';
+import { fetchYouTubePlaylist } from '@/lib/youtube/playlist';
 import { fetchArchiveMovies } from '@/lib/movies/archive';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,6 @@ async function fetchMovies(url: string): Promise<Movie[]> {
     if (!response.ok) return [];
     const data = await response.json();
     const movies = (data.results || []) as Movie[];
-    // Filter out movies without poster image
     return movies.filter((movie) => movie.poster_path !== null);
   } catch (error) {
     console.error('Failed to fetch movies:', error);
@@ -33,7 +33,6 @@ async function fetchYouTubeMovies(): Promise<any[]> {
     'Nollywood full movie 2025',
     'African full movie 2026',
   ];
-
   try {
     const results = await Promise.all(queries.map((q) => searchYouTube(q, 4)));
     return results.flat();
@@ -64,6 +63,12 @@ export default async function MoviesPage() {
     ),
     fetchArchiveMovies('nollywood', 20),
   ]);
+
+  // Use your real playlist ID for the Nollywood full movies section
+  const playlist1 = await fetchYouTubePlaylist('PL6jGPxDsfalAMGeQzPpEE3BGs7Ya7Mupc', 8);
+  // More playlist IDs can be added later when available
+  // const playlist2 = await fetchYouTubePlaylist('SECOND_PLAYLIST_ID', 8);
+  // const playlist3 = await fetchYouTubePlaylist('THIRD_PLAYLIST_ID', 8);
 
   const youtubeMovies = await fetchYouTubeMovies();
 
@@ -105,34 +110,11 @@ export default async function MoviesPage() {
         </section>
       )}
 
-      {/* YouTube Full Movies Section */}
-      {youtubeMovies.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-3">📺 Full Movies on YouTube</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
-            {youtubeMovies.map((video) => (
-              <div key={video.videoId} className="snap-start flex-shrink-0 w-40 sm:w-48">
-                <a
-                  href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-gray-900 rounded-xl shadow-md overflow-hidden"
-                >
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full aspect-video object-cover"
-                    loading="lazy"
-                  />
-                  <div className="p-2">
-                    <h3 className="text-xs font-semibold text-white line-clamp-2">{video.title}</h3>
-                  </div>
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Nollywood Full Movies Playlist */}
+      {playlist1.length > 0 && <VideoSection title="🎞️ Nollywood Full Movies" videos={playlist1} />}
+
+      {/* YouTube Search Results */}
+      {youtubeMovies.length > 0 && <VideoSection title="📺 Full Movies on YouTube" videos={youtubeMovies} />}
     </div>
   );
 }
@@ -161,6 +143,40 @@ function MovieSection({ title, movies }: { title: string; movies: Movie[] }) {
               <p className="text-[10px] text-gray-400 mt-1">{movie.release_date?.substring(0, 4)}</p>
             </div>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function VideoSection({ title, videos }: { title: string; videos: any[] }) {
+  if (videos.length === 0) return null;
+
+  return (
+    <section className="mb-8">
+      <h2 className="text-xl font-bold text-white mb-3">{title}</h2>
+      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
+        {videos.map((video) => (
+          <div key={video.videoId || video.identifier} className="snap-start flex-shrink-0 w-40 sm:w-48">
+            <a
+              href={video.videoId
+                ? `https://www.youtube.com/watch?v=${video.videoId}`
+                : `https://archive.org/details/${video.identifier}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-900 rounded-xl shadow-md overflow-hidden"
+            >
+              <img
+                src={video.thumbnail}
+                alt={video.title}
+                className="w-full aspect-video object-cover"
+                loading="lazy"
+              />
+              <div className="p-2">
+                <h3 className="text-xs font-semibold text-white line-clamp-2">{video.title}</h3>
+              </div>
+            </a>
+          </div>
         ))}
       </div>
     </section>
