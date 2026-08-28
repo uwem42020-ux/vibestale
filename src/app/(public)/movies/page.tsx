@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { searchYouTube } from '@/lib/youtube/search';
 import { fetchYouTubePlaylist } from '@/lib/youtube/playlist';
 import { fetchArchiveMovies } from '@/lib/movies/archive';
+import PlaylistSection from '@/components/movies/PlaylistSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,27 +49,24 @@ export default async function MoviesPage() {
     return <p className="text-red-500">TMDB_API_KEY is not set.</p>;
   }
 
-  const [nollywood, foreign, nowPlaying, upcoming, archiveMovies] = await Promise.all([
-    fetchMovies(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
-    ),
-    fetchMovies(
-      `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
-    ),
-    fetchMovies(
-      `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&page=1`
-    ),
-    fetchMovies(
-      `https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&page=1`
-    ),
-    fetchArchiveMovies('nollywood', 20),
-  ]);
-
-  // Use your real playlist ID for the Nollywood full movies section
-  const playlist1 = await fetchYouTubePlaylist('PL6jGPxDsfalAMGeQzPpEE3BGs7Ya7Mupc', 8);
-  // More playlist IDs can be added later when available
-  // const playlist2 = await fetchYouTubePlaylist('SECOND_PLAYLIST_ID', 8);
-  // const playlist3 = await fetchYouTubePlaylist('THIRD_PLAYLIST_ID', 8);
+  const [nollywood, foreign, nowPlaying, upcoming, archiveMovies, playlist1Data, playlist2Data] =
+    await Promise.all([
+      fetchMovies(
+        `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
+      ),
+      fetchMovies(
+        `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
+      ),
+      fetchMovies(
+        `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&page=1`
+      ),
+      fetchMovies(
+        `https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&page=1`
+      ),
+      fetchArchiveMovies('nollywood', 20),
+      fetchYouTubePlaylist('PL6jGPxDsfalAMGeQzPpEE3BGs7Ya7Mupc', 8),
+      fetchYouTubePlaylist('PL6jGPxDsfalCoKySf7UMeVVw6fjRcB-bm', 8),
+    ]);
 
   const youtubeMovies = await fetchYouTubeMovies();
 
@@ -110,11 +108,25 @@ export default async function MoviesPage() {
         </section>
       )}
 
-      {/* Nollywood Full Movies Playlist */}
-      {playlist1.length > 0 && <VideoSection title="🎞️ Nollywood Full Movies" videos={playlist1} />}
+      {/* Playlist sections with Load more */}
+      <PlaylistSection
+        title="🎞️ NollyTimes TV Full Movies"
+        playlistId="PL6jGPxDsfalAMGeQzPpEE3BGs7Ya7Mupc"
+        initialVideos={playlist1Data.videos}
+        initialPageToken={playlist1Data.nextPageToken}
+      />
+
+      <PlaylistSection
+        title="🎞️ African Movies Plus"
+        playlistId="PL6jGPxDsfalCoKySf7UMeVVw6fjRcB-bm"
+        initialVideos={playlist2Data.videos}
+        initialPageToken={playlist2Data.nextPageToken}
+      />
 
       {/* YouTube Search Results */}
-      {youtubeMovies.length > 0 && <VideoSection title="📺 Full Movies on YouTube" videos={youtubeMovies} />}
+      {youtubeMovies.length > 0 && (
+        <VideoSection title="📺 Full Movies on YouTube" videos={youtubeMovies} />
+      )}
     </div>
   );
 }
@@ -157,11 +169,9 @@ function VideoSection({ title, videos }: { title: string; videos: any[] }) {
       <h2 className="text-xl font-bold text-white mb-3">{title}</h2>
       <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
         {videos.map((video) => (
-          <div key={video.videoId || video.identifier} className="snap-start flex-shrink-0 w-40 sm:w-48">
+          <div key={video.videoId} className="snap-start flex-shrink-0 w-40 sm:w-48">
             <a
-              href={video.videoId
-                ? `https://www.youtube.com/watch?v=${video.videoId}`
-                : `https://archive.org/details/${video.identifier}`}
+              href={`https://www.youtube.com/watch?v=${video.videoId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-900 rounded-xl shadow-md overflow-hidden"
