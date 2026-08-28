@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { searchYouTube } from '@/lib/youtube/search';
+import { fetchArchiveMovies } from '@/lib/movies/archive';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ async function fetchMovies(url: string): Promise<Movie[]> {
     if (!response.ok) return [];
     const data = await response.json();
     const movies = (data.results || []) as Movie[];
-    // Only return movies that have a poster image
+    // Filter out movies without poster image
     return movies.filter((movie) => movie.poster_path !== null);
   } catch (error) {
     console.error('Failed to fetch movies:', error);
@@ -48,23 +49,20 @@ export default async function MoviesPage() {
     return <p className="text-red-500">TMDB_API_KEY is not set.</p>;
   }
 
-  const [nollywood, foreign, nowPlaying, upcoming] = await Promise.all([
-    // Nollywood: origin country Nigeria
+  const [nollywood, foreign, nowPlaying, upcoming, archiveMovies] = await Promise.all([
     fetchMovies(
       `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
     ),
-    // Foreign Top Rated
     fetchMovies(
       `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
     ),
-    // Now Playing
     fetchMovies(
       `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&page=1`
     ),
-    // Upcoming International
     fetchMovies(
       `https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&page=1`
     ),
+    fetchArchiveMovies('nollywood', 20),
   ]);
 
   const youtubeMovies = await fetchYouTubeMovies();
@@ -77,6 +75,35 @@ export default async function MoviesPage() {
       <MovieSection title="🌍 Foreign Top Rated" movies={foreign} />
       <MovieSection title="🆕 Now Playing" movies={nowPlaying} />
       <MovieSection title="⏳ Upcoming International" movies={upcoming} />
+
+      {/* Archive Movies Section */}
+      {archiveMovies.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-xl font-bold text-white mb-3">🗂️ Classic/Free Movies</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x">
+            {archiveMovies.map((movie) => (
+              <a
+                key={movie.identifier}
+                href={`https://archive.org/details/${movie.identifier}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="snap-start flex-shrink-0 w-40 sm:w-48 bg-gray-900 rounded-xl shadow-sm hover:shadow-md overflow-hidden"
+              >
+                <img
+                  src={`https://archive.org/services/img/${movie.identifier}`}
+                  alt={movie.title}
+                  className="w-full aspect-[2/3] object-cover"
+                  loading="lazy"
+                />
+                <div className="p-2">
+                  <h3 className="text-xs font-semibold text-white line-clamp-1">{movie.title}</h3>
+                  {movie.year && <p className="text-[10px] text-gray-400 mt-1">{movie.year}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* YouTube Full Movies Section */}
       {youtubeMovies.length > 0 && (
