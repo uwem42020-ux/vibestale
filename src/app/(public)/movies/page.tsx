@@ -18,7 +18,8 @@ async function fetchMovies(url: string): Promise<Movie[]> {
     if (!response.ok) return [];
     const data = await response.json();
     return data.results || [];
-  } catch {
+  } catch (error) {
+    console.error('Failed to fetch movies:', error);
     return [];
   }
 }
@@ -30,8 +31,13 @@ async function fetchYouTubeMovies(): Promise<any[]> {
     'African full movie 2026',
   ];
 
-  const results = await Promise.all(queries.map((q) => searchYouTube(q, 4)));
-  return results.flat();
+  try {
+    const results = await Promise.all(queries.map((q) => searchYouTube(q, 4)));
+    return results.flat();
+  } catch (error) {
+    console.error('YouTube fetch failed:', error);
+    return [];
+  }
 }
 
 export default async function MoviesPage() {
@@ -42,7 +48,7 @@ export default async function MoviesPage() {
 
   const [nollywood, foreign, nowPlaying, topRated] = await Promise.all([
     fetchMovies(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&region=NG&with_original_language=en|yo|ha|ig&sort_by=popularity.desc&page=1`
+      `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
     ),
     fetchMovies(
       `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=1`
@@ -59,7 +65,7 @@ export default async function MoviesPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">🎬 Movies</h1>
+      <h1 className="text-3xl font-bold mb-6 text-white">🎬 Movies</h1>
 
       <MovieSection title="🇳🇬 Nollywood" movies={nollywood} />
       <MovieSection title="🌍 Foreign" movies={foreign} />
