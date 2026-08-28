@@ -17,7 +17,9 @@ async function fetchMovies(url: string): Promise<Movie[]> {
     const response = await fetch(url, { next: { revalidate: 21600 } });
     if (!response.ok) return [];
     const data = await response.json();
-    return data.results || [];
+    const movies = (data.results || []) as Movie[];
+    // Only return movies that have a poster image
+    return movies.filter((movie) => movie.poster_path !== null);
   } catch (error) {
     console.error('Failed to fetch movies:', error);
     return [];
@@ -46,12 +48,12 @@ export default async function MoviesPage() {
     return <p className="text-red-500">TMDB_API_KEY is not set.</p>;
   }
 
-  const [nollywood, foreign, nowPlaying, topRated] = await Promise.all([
+  const [nollywood, foreign, nowPlaying, upcoming] = await Promise.all([
     // Nollywood: origin country Nigeria
     fetchMovies(
       `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_origin_country=NG&sort_by=popularity.desc&page=1`
     ),
-    // Foreign: Top Rated (distinct from now playing)
+    // Foreign Top Rated
     fetchMovies(
       `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&page=1`
     ),
@@ -59,9 +61,9 @@ export default async function MoviesPage() {
     fetchMovies(
       `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&page=1`
     ),
-    // Top Rated (extra section)
+    // Upcoming International
     fetchMovies(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=1`
+      `https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&page=1`
     ),
   ]);
 
@@ -74,7 +76,7 @@ export default async function MoviesPage() {
       <MovieSection title="🇳🇬 Nollywood" movies={nollywood} />
       <MovieSection title="🌍 Foreign Top Rated" movies={foreign} />
       <MovieSection title="🆕 Now Playing" movies={nowPlaying} />
-      <MovieSection title="🔥 Popular International" movies={topRated} />
+      <MovieSection title="⏳ Upcoming International" movies={upcoming} />
 
       {/* YouTube Full Movies Section */}
       {youtubeMovies.length > 0 && (
@@ -121,19 +123,12 @@ function MovieSection({ title, movies }: { title: string; movies: Movie[] }) {
             href={`/movie/${movie.id}`}
             className="snap-start flex-shrink-0 w-40 sm:w-48 bg-gray-900 rounded-xl shadow-sm hover:shadow-md overflow-hidden"
           >
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full aspect-[2/3] object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full aspect-[2/3] bg-gray-800 flex flex-col items-center justify-center text-gray-500">
-                <span className="text-2xl">🎬</span>
-                <span className="text-xs mt-2 px-2 text-center line-clamp-2">{movie.title}</span>
-              </div>
-            )}
+            <img
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={movie.title}
+              className="w-full aspect-[2/3] object-cover"
+              loading="lazy"
+            />
             <div className="p-2">
               <h3 className="text-xs font-semibold text-white line-clamp-1">{movie.title}</h3>
               <p className="text-[10px] text-gray-400 mt-1">{movie.release_date?.substring(0, 4)}</p>
