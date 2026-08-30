@@ -8,8 +8,9 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-function getFallbackImage(slug: string): string {
-  return `https://picsum.photos/seed/${slug}/800/400`;
+function getFallbackImage(): string {
+  // Return empty string so frontend can show placeholder icon if no image
+  return '';
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -54,21 +55,28 @@ export default async function HeadlinePage({ params }: Props) {
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
-  const fallbackImage = getFallbackImage(headline.slug);
-  const imageSrc = headline.image_url || fallbackImage;
 
   return (
-    <article className="max-w-3xl mx-auto bg-white rounded-lg shadow p-6">
-      <img
-        src={imageSrc}
-        alt={headline.title}
-        className="w-full h-64 object-cover rounded mb-4"
-        referrerPolicy="no-referrer"
-      />
+    <article className="max-w-3xl mx-auto bg-gray-900 rounded-lg shadow p-6">
+      {/* Cover Image */}
+      {headline.image_url ? (
+        <img
+          src={headline.image_url}
+          alt={headline.title}
+          className="w-full h-64 object-cover rounded mb-4"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <div className="w-full h-64 bg-gray-800 rounded mb-4 flex items-center justify-center">
+          <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      )}
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">{headline.title}</h1>
+      <h1 className="text-2xl font-bold text-white mb-4">{headline.title}</h1>
 
-      <div className="flex items-center gap-2 mb-4 text-sm text-gray-500 flex-wrap">
+      <div className="flex items-center gap-2 mb-4 text-sm text-gray-400 flex-wrap">
         {headline.sources && (
           <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
         )}
@@ -80,7 +88,7 @@ export default async function HeadlinePage({ params }: Props) {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false,
+            hour12: true,
           })}
         </span>
         <span>·</span>
@@ -88,9 +96,9 @@ export default async function HeadlinePage({ params }: Props) {
       </div>
 
       {headline.ai_summary && (
-        <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
-          <span className="font-semibold text-green-800">AI Analysis: </span>
-          <p className="text-gray-700 mt-1">{headline.ai_summary}</p>
+        <div className="bg-green-950 border-l-4 border-green-500 p-4 mb-4">
+          <span className="font-semibold text-green-300">AI Analysis: </span>
+          <p className="text-gray-200 mt-1">{headline.ai_summary}</p>
         </div>
       )}
 

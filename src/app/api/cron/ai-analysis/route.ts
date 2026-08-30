@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateCommentary } from '@/lib/ai/commentary';
-import { matchImage } from '@/lib/images/match-image';
+import { fetchArticleImage } from '@/lib/news/fetchArticleImage';
 
 export async function GET(req: Request) {
   // Protect endpoint with cron secret
@@ -12,12 +12,12 @@ export async function GET(req: Request) {
 
   const supabase = await createClient();
 
-  // Get newest pending headlines first (descending order)
+  // Get newest pending headlines first (max 5 per run)
   const { data: pending, error: fetchError } = await supabase
     .from('headlines')
-    .select('id, title')
+    .select('id, title, original_url')
     .eq('ai_analysis_status', 'pending')
-    .order('fetched_at', { ascending: false })  // newest first
+    .order('fetched_at', { ascending: false })
     .limit(5);
 
   if (fetchError || !pending || pending.length === 0) {
@@ -28,9 +28,13 @@ export async function GET(req: Request) {
 
   for (const headline of pending) {
     try {
+      // 1. Generate AI commentary
       const analysis = await generateCommentary(headline.title);
-      const imageUrl = matchImage(headline.title);
 
+      // 2. Fetch real article image (manual og:image + Microlink fallback)
+      const imageUrl = await fetchArticleImage(headline.original_url);
+
+      // 3. Update database
       const { error: updateError } = await supabase
         .from('headlines')
         .update({
@@ -39,11 +43,11 @@ export async function GET(req: Request) {
           ai_key_entities: analysis.keyEntities,
           ai_confidence_score: analysis.confidenceScore,
           ai_analysis_status: 'completed',
-          ai_model_used: 'openai', // or 'openrouter' depending on actual path
+          ai_model_used: 'openai',
           meta_title: `${headline.title.substring(0, 55)} | VibeStale`,
           meta_description: analysis.summary.substring(0, 155),
-          image_url: imageUrl, // set matched image (may be null)
-          category: analysis.category, // store AI category
+          image_url: imageUrl, // real article image or null
+          category: analysis.category,
           updated_at: new Date().toISOString(),
         })
         .eq('id', headline.id);
