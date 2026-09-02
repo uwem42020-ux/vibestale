@@ -85,8 +85,12 @@ export default function Header() {
 
           {/* Dropdown */}
           <div className="absolute left-0 right-0 top-full bg-black/80 backdrop-blur-lg border-b border-gray-800 z-50 md:hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-              <span className="text-sm font-semibold text-gray-300">Menu</span>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+              <img
+                src="/whitelogo.png"
+                alt="VibeStale"
+                className="h-8 w-auto"
+              />
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
@@ -98,17 +102,17 @@ export default function Header() {
                 </svg>
               </button>
             </div>
-            <nav className="flex flex-col gap-4 px-6 py-6">
+            <nav className="flex flex-col gap-3 px-5 py-4">
               <Link
                 href="/media"
-                className="text-lg text-white hover:text-green-400 transition"
+                className="text-base text-white hover:text-green-400 transition"
                 onClick={() => setMenuOpen(false)}
               >
                 Media
               </Link>
               <Link
                 href="/music"
-                className="text-lg text-white hover:text-green-400 transition"
+                className="text-base text-white hover:text-green-400 transition"
                 onClick={() => setMenuOpen(false)}
               >
                 Music
