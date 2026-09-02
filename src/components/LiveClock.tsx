@@ -2,48 +2,62 @@
 
 import { useEffect, useState } from 'react';
 
-interface TimeApiResponse {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  minute: number;
-  seconds: number;
+interface LiveClockProps {
+  initialTime?: string | null;
 }
 
-export default function LiveClock() {
-  const [now, setNow] = useState<Date | null>(null);
-  const [error, setError] = useState(false);
+export default function LiveClock({ initialTime }: LiveClockProps) {
+  const [now, setNow] = useState<Date | null>(
+    initialTime ? new Date(initialTime) : null
+  );
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    async function fetchTime() {
-      try {
-        const response = await fetch(
-          'https://timeapi.io/api/Time/current/zone?timeZone=Africa/Lagos'
-        );
-        if (!response.ok) throw new Error('Failed to fetch time');
-        const data: TimeApiResponse = await response.json();
-
-        const serverDate = new Date(
-          data.year,
-          data.month - 1,
-          data.day,
-          data.hour,
-          data.minute,
-          data.seconds
-        );
-        setNow(serverDate);
-        setError(false);
-      } catch (err) {
-        console.error('Failed to fetch server time:', err);
-        setError(true);
-        setNow(new Date()); // fallback to device time
+    if (!now) {
+      // If no initialTime, fetch from reliable server
+      async function fetchTime() {
+        try {
+          const response = await fetch(
+            'https://timeapi.io/api/Time/current/zone?timeZone=Africa/Lagos'
+          );
+          if (!response.ok) throw new Error('Failed to fetch time');
+          const data = {
+            year: response.headers.get('x-year'),
+            month: response.headers.get('x-month'),
+            day: response.headers.get('x-day'),
+            hour: response.headers.get('x-hour'),
+            minute: response.headers.get('x-minute'),
+            seconds: response.headers.get('x-seconds'),
+          };
+          // Fallback: parse JSON if headers not available
+          if (!data.year) {
+            const json = await response.json();
+            setNow(new Date(
+              json.year,
+              json.month - 1,
+              json.day,
+              json.hour,
+              json.minute,
+              json.seconds
+            ));
+          } else {
+            setNow(new Date(
+              Number(data.year),
+              Number(data.month) - 1,
+              Number(data.day),
+              Number(data.hour),
+              Number(data.minute),
+              Number(data.seconds)
+            ));
+          }
+        } catch (error) {
+          console.error('Failed to fetch server time:', error);
+          setNow(new Date()); // fallback to device time
+        }
       }
+      fetchTime();
     }
-
-    fetchTime();
 
     interval = setInterval(() => {
       setNow((prev) => {
@@ -56,8 +70,7 @@ export default function LiveClock() {
   }, []);
 
   if (!now) {
-    // Return an empty div to avoid layout shift, or null to show nothing
-    return null;
+    return null; // show nothing if no time yet
   }
 
   const dateString = new Intl.DateTimeFormat('en-NG', {
@@ -80,7 +93,6 @@ export default function LiveClock() {
     <div className="text-xs text-gray-300 flex flex-col gap-0.5">
       <span>{dateString}</span>
       <span className="font-semibold text-white">{timeString} WAT</span>
-      {error && <span className="text-[10px] text-gray-500">(device time)</span>}
     </div>
   );
 }

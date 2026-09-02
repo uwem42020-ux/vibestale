@@ -18,6 +18,9 @@ const categories = [
 export default async function HomePage() {
   const supabase = await createClient();
 
+  // Server-rendered time for instant display
+  const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
+
   const { data: headlines, error } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -44,7 +47,9 @@ export default async function HomePage() {
       <aside className="hidden md:block w-56 flex-shrink-0">
         <div className="sticky top-24 space-y-1">
           <div className="mb-4">
-            <LiveClock />
+            <LiveClock initialTime={serverNow} />
+            {/* Divider line */}
+            <div className="mt-4 border-t border-gray-700" />
           </div>
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Categories</h2>
           {categories.map((cat) => (
@@ -63,7 +68,7 @@ export default async function HomePage() {
       <div className="flex-1 min-w-0">
         {/* Mobile date + categories slider */}
         <div className="md:hidden mb-4">
-          <LiveClock />
+          <LiveClock initialTime={serverNow} />
         </div>
         <div className="md:hidden mb-4 relative">
           <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
@@ -77,7 +82,6 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-          {/* subtle swipe hint */}
           <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-black to-transparent" />
         </div>
 
