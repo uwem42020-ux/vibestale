@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import SourceBadge from '@/components/SourceBadge';
 import WhatsAppShare from '@/components/share/WhatsAppShare';
