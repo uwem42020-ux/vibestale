@@ -71,9 +71,6 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
 
         {headline.ai_summary && (
           <p className="mt-1 text-xs text-gray-300 line-clamp-2">
-            <span className="inline-block bg-green-900 text-green-200 text-[9px] px-1.5 py-0.5 rounded mr-1 align-middle">
-              AI
-            </span>
             {headline.ai_summary}
           </p>
         )}

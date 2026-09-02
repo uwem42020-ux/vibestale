@@ -21,18 +21,18 @@ export default async function CategoryPage({ params }: Props) {
 
   if (error) {
     console.error('Error fetching category headlines:', error);
-    return <div>Error loading headlines.</div>;
+    return <div className="text-red-500">Error loading headlines.</div>;
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold text-white mb-4">
         Category: {slug.charAt(0).toUpperCase() + slug.slice(1)}
       </h1>
-      {headlines.length === 0 ? (
-        <p>No headlines in this category yet.</p>
+      {!headlines || headlines.length === 0 ? (
+        <p className="text-gray-400">No headlines in this category yet.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="space-y-4">
           {headlines.map((headline) => (
             <HeadlineCard key={headline.id} headline={headline} />
           ))}
