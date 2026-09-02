@@ -32,15 +32,24 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
 
+  const fallbackImage = '/placeholder.png';
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = fallbackImage;
+  };
+
   return (
     <article className="bg-gray-900 rounded-2xl shadow-md overflow-hidden">
       <Link href={`/headline/${headline.slug}`} className="block">
         {headline.image_url ? (
           <img
-            src={headline.image_url}
+            src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
             alt={headline.title}
             className="w-full h-56 sm:h-72 object-cover"
             loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={handleImageError}
           />
         ) : (
           <div className="w-full h-56 sm:h-72 bg-gray-800 flex items-center justify-center">

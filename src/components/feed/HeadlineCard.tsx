@@ -27,27 +27,32 @@ function timeAgo(dateString: string | null): string {
   if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  return new Intl.DateTimeFormat('en-NG', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(date);
+  return new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }
 
 export default function HeadlineCard({ headline }: { headline: Headline }) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
 
+  // Fallback image (can be a local neutral placeholder or a reliable stock)
+  const fallbackImage = '/placeholder.png'; // optional: create a simple PNG in public
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.onerror = null; // prevent infinite loop
+    e.currentTarget.src = fallbackImage;
+  };
+
   return (
     <article className="bg-gray-900 rounded-xl shadow-sm hover:shadow-md transition p-3 flex gap-3 items-start">
-      {/* Thumbnail */}
       <Link href={`/headline/${headline.slug}`} className="flex-shrink-0">
         {headline.image_url ? (
           <img
-            src={headline.image_url}
+            src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
             alt={headline.title}
             className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
             loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={handleImageError}
           />
         ) : (
           <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500">
@@ -58,7 +63,6 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
         )}
       </Link>
 
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
           {headline.sources && (

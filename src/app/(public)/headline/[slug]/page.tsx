@@ -8,11 +8,6 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-function getFallbackImage(): string {
-  // Return empty string so frontend can show placeholder icon if no image
-  return '';
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
@@ -58,10 +53,9 @@ export default async function HeadlinePage({ params }: Props) {
 
   return (
     <article className="max-w-3xl mx-auto bg-gray-900 rounded-lg shadow p-6">
-      {/* Cover Image */}
       {headline.image_url ? (
         <img
-          src={headline.image_url}
+          src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
           alt={headline.title}
           className="w-full h-64 object-cover rounded mb-4"
           referrerPolicy="no-referrer"
