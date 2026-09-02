@@ -1,23 +1,23 @@
 import { createClient } from '@/lib/supabase/server';
-import AudioCard from '@/components/music/AudioCard';
+import VideoCard from '@/components/music/VideoCard';
 import Sidebar from '@/components/Sidebar';
 import LiveClock from '@/components/LiveClock';
 
 export const dynamic = 'force-dynamic';
 
-export default async function MusicPage() {
+export default async function MusicVideosPage() {
   const supabase = await createClient();
   const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
 
-  const { data: tracks, error } = await supabase
-    .from('audio_tracks')
+  const { data: videos, error } = await supabase
+    .from('youtube_videos')
     .select('id, title, artist, youtube_video_id, thumbnail_url')
     .order('created_at', { ascending: false })
     .limit(20);
 
   if (error) {
-    console.error('Error fetching audio tracks:', error);
-    return <div className="text-red-500">Error loading audio.</div>;
+    console.error('Error fetching music videos:', error);
+    return <div className="text-red-500">Error loading videos.</div>;
   }
 
   return (
@@ -29,17 +29,17 @@ export default async function MusicPage() {
           <LiveClock initialTime={serverNow} />
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-2">🎧 Music</h1>
-        <p className="text-sm text-gray-400 mb-6">Listen to the latest Nigerian songs.</p>
+        <h1 className="text-3xl font-bold text-white mb-2">🎬 Music Videos</h1>
+        <p className="text-sm text-gray-400 mb-6">Watch the latest Nigerian music videos.</p>
 
-        {tracks && tracks.length > 0 ? (
-          <div className="space-y-3">
-            {tracks.map((track) => (
-              <AudioCard key={track.id} track={track} />
+        {videos && videos.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {videos.map((video) => (
+              <VideoCard key={video.id} video={video} />
             ))}
           </div>
         ) : (
-          <p className="text-gray-400">No audio tracks yet.</p>
+          <p className="text-gray-400">No music videos yet.</p>
         )}
       </div>
     </div>
