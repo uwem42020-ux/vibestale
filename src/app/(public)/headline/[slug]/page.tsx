@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import WhatsAppShare from '@/components/share/WhatsAppShare';
+import ShareMenu from '@/components/share/ShareMenu';
 import SourceBadge from '@/components/SourceBadge';
 import type { Metadata } from 'next';
 
@@ -17,9 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq('slug', slug)
     .maybeSingle();
 
-  if (!headline) {
-    return { title: 'Not Found' };
-  }
+  if (!headline) return { title: 'Not Found' };
 
   return {
     title: `${headline.title} | VibeStale`,
@@ -44,9 +42,7 @@ export default async function HeadlinePage({ params }: Props) {
     .is('deleted_at', null)
     .maybeSingle();
 
-  if (error || !headline) {
-    notFound();
-  }
+  if (error || !headline) notFound();
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
@@ -89,23 +85,39 @@ export default async function HeadlinePage({ params }: Props) {
         <span className="capitalize">{headline.category || 'general'}</span>
       </div>
 
-      {headline.ai_summary && (
-        <div className="bg-green-950 border-l-4 border-green-500 p-4 mb-4">
-          <span className="font-semibold text-green-300">AI Analysis: </span>
-          <p className="text-gray-200 mt-1">{headline.ai_summary}</p>
-        </div>
-      )}
+      {/* AI Analysis as normal text */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-white mb-2">Analysis</h2>
+        {headline.ai_summary?.split('\n').map((paragraph: string, index: number) => (
+          <p key={index} className="text-gray-200 leading-relaxed mb-3">
+            {paragraph}
+          </p>
+        ))}
+      </div>
 
-      <div className="flex justify-between items-center mt-6">
+      {/* Advert / Contact */}
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 text-center">
+        <p className="text-sm text-gray-300">Advertise with us</p>
+        <a
+          href="https://wa.me/2348038887589"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-green-500 font-semibold text-lg"
+        >
+          WhatsApp: +234 803 888 7589
+        </a>
+      </div>
+
+      <div className="flex justify-between items-center">
         <a
           href={headline.original_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800"
+          className="inline-block px-4 py-2 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition"
         >
-          Read Full Story on Source
+          Read Full Story
         </a>
-        <WhatsAppShare title={headline.title} url={shareUrl} />
+        <ShareMenu title={headline.title} url={shareUrl} />
       </div>
     </article>
   );
