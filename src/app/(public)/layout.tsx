@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import BottomNav from '@/components/navigation/BottomNav';
 import { AudioProvider } from '@/components/music/AudioProvider';
 import PlayerBar from '@/components/music/PlayerBar';
@@ -17,9 +18,7 @@ export default function PublicLayout({
           {children}
         </main>
 
-        <footer className="bg-black border-t border-gray-800 py-4 text-center text-sm text-gray-400 hidden md:block">
-          <p>© {new Date().getFullYear()} VibeStale — AI-powered Nigerian news intelligence</p>
-        </footer>
+        <Footer />
 
         <BottomNav />
         <PlayerBar />
