@@ -26,6 +26,7 @@ type AudioContextType = {
   prevTrack: () => void;
   seekTo: (time: number) => void;
   setVolume: (vol: number) => void;
+  closePlayer: () => void;
 };
 
 const AudioContext = createContext<AudioContextType>({
@@ -41,6 +42,7 @@ const AudioContext = createContext<AudioContextType>({
   prevTrack: () => {},
   seekTo: () => {},
   setVolume: () => {},
+  closePlayer: () => {},
 });
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
@@ -54,6 +56,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const playerRef = useRef<any>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Cleanup function for player
   const cleanupPlayer = useCallback(() => {
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
@@ -69,6 +72,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Close player and reset state
+  const closePlayer = useCallback(() => {
+    cleanupPlayer();
+    setCurrentTrack(null);
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+  }, [cleanupPlayer]);
+
+  // Load YouTube API
   const loadYouTubeAPI = useCallback(() => {
     return new Promise<void>((resolve) => {
       if (window.YT && window.YT.Player) {
@@ -76,8 +89,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Store existing callback
       const previousCallback = window.onYouTubeIframeAPIReady;
 
+      // Set new callback
       window.onYouTubeIframeAPIReady = () => {
         if (previousCallback) {
           previousCallback();
@@ -85,6 +100,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         resolve();
       };
 
+      // Load script if not already loading
       if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
@@ -94,6 +110,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // Initialize YouTube Player
   useEffect(() => {
     if (!currentTrack) {
       cleanupPlayer();
@@ -108,6 +125,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         
         if (!isMounted) return;
         
+        // Clean up existing player
         cleanupPlayer();
 
         const playerInstance = new window.YT.Player(
@@ -164,6 +182,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     initializePlayer();
 
+    // Update progress
     progressIntervalRef.current = setInterval(() => {
       if (playerRef.current && playerRef.current.getCurrentTime) {
         const currentTime = playerRef.current.getCurrentTime();
@@ -182,9 +201,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setProgress(0);
     setDuration(0);
     
+    // Set queue if trackList is provided
     if (trackList && trackList.length > 0) {
       setQueue(trackList);
     } else if (queue.length === 0) {
+      // If no queue, set single track as queue
       setQueue([track]);
     }
   };
@@ -259,6 +280,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       cleanupPlayer();
@@ -280,10 +302,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         prevTrack,
         seekTo,
         setVolume: handleVolumeChange,
+        closePlayer,
       }}
     >
       {children}
       
+      {/* Hidden YouTube player container */}
       {currentTrack && (
         <div 
           id={`youtube-player-${currentTrack.id}`} 

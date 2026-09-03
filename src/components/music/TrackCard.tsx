@@ -15,15 +15,24 @@ type Track = {
 
 export default function TrackCard({ track }: { track: Track }) {
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio();
-  const isThisPlaying = currentTrack?.trackName === track.trackName && isPlaying;
+  const isThisPlaying = currentTrack?.title === track.trackName && isPlaying;
 
   const coverImage = track.artworkUrl100?.replace('100x100', '400x400') || '/placeholder.png';
 
   const handlePlay = () => {
+    // Convert iTunes track to AudioProvider Track format
+    const audioTrack = {
+      id: track.trackName,
+      title: track.trackName,
+      artist: track.artistName,
+      youtube_video_id: track.youtubeVideoId || '',
+      thumbnail_url: coverImage,
+    };
+    
     if (isThisPlaying) {
       togglePlay();
     } else {
-      playTrack(track);
+      playTrack(audioTrack);
     }
   };
 
@@ -41,7 +50,7 @@ export default function TrackCard({ track }: { track: Track }) {
             className="absolute inset-0 flex items-center justify-center bg-black/20"
             aria-label={isThisPlaying ? 'Pause' : 'Play'}
           >
-            <span className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center shadow-lg">
+            <span className="w-10 h-10 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-lg">
               {isThisPlaying ? (
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
@@ -73,7 +82,7 @@ export default function TrackCard({ track }: { track: Track }) {
             href={track.trackViewUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-700 text-[10px] font-medium hover:underline"
+            className="text-[var(--accent)] text-[10px] font-medium hover:underline"
           >
             iTunes ↗
           </a>
