@@ -15,7 +15,6 @@ export default function LiveTVCard({ channel }: { channel: LiveTVChannel }) {
 
   // Stop playback if another video starts
   useEffect(() => {
-    const stopVideo = () => setPlaying(false);
     const handleVideoPlay = (e: Event) => {
       const custom = e as CustomEvent<{ id: string }>;
       if (custom.detail?.id !== channel.videoId) {
@@ -28,7 +27,6 @@ export default function LiveTVCard({ channel }: { channel: LiveTVChannel }) {
   }, [channel.videoId]);
 
   const handlePlay = () => {
-    // Notify other cards to stop
     window.dispatchEvent(
       new CustomEvent('vibestale:live-tv-play', { detail: { id: channel.videoId } })
     );
@@ -91,14 +89,6 @@ export default function LiveTVCard({ channel }: { channel: LiveTVChannel }) {
         {channel.description && (
           <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{channel.description}</p>
         )}
-        <a
-          href={`https://www.youtube.com/watch?v=${channel.videoId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-green-500 text-xs font-medium hover:underline"
-        >
-          Watch on YouTube ↗
-        </a>
       </div>
     </div>
   );

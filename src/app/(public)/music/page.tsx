@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import LiveClock from '@/components/LiveClock';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export default async function MusicPage() {
   const supabase = await createClient();
@@ -13,7 +14,7 @@ export default async function MusicPage() {
     .from('audio_tracks')
     .select('id, title, artist, youtube_video_id, thumbnail_url')
     .order('created_at', { ascending: false })
-    .limit(20);
+    .limit(8);  // reduced from 20
 
   if (error) {
     console.error('Error fetching audio tracks:', error);

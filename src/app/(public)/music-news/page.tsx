@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import LiveClock from '@/components/LiveClock';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export default async function CelebrityNewsPage() {
   const supabase = await createClient();
@@ -15,7 +16,7 @@ export default async function CelebrityNewsPage() {
     .eq('ai_analysis_status', 'completed')
     .is('deleted_at', null)
     .order('published_at', { ascending: false })
-    .limit(30);
+    .limit(8);  // reduced from 30
 
   if (error) {
     console.error('Error fetching entertainment news:', error);

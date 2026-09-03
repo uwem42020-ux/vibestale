@@ -1,6 +1,9 @@
 import LiveTVCard from '@/components/livetv/LiveTVCard';
+import Sidebar from '@/components/Sidebar';
+import LiveClock from '@/components/LiveClock';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 const channels = [
   {
@@ -35,16 +38,26 @@ const channels = [
   },
 ];
 
-export default function LiveTVPage() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-white mb-2">🔴 Live News TV</h1>
-      <p className="text-sm text-gray-400 mb-6">Watch live news from trusted channels.</p>
+export default async function LiveTVPage() {
+  const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {channels.map((channel) => (
-          <LiveTVCard key={channel.videoId} channel={channel} />
-        ))}
+  return (
+    <div className="md:flex md:gap-8">
+      <Sidebar initialTime={serverNow} />
+
+      <div className="flex-1 min-w-0">
+        <div className="md:hidden mb-4">
+          <LiveClock initialTime={serverNow} />
+        </div>
+
+        <h1 className="text-3xl font-bold text-white mb-2">🔴 Live News TV</h1>
+        <p className="text-sm text-gray-400 mb-6">Watch live news from trusted channels.</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {channels.map((channel) => (
+            <LiveTVCard key={channel.videoId} channel={channel} />
+          ))}
+        </div>
       </div>
     </div>
   );
