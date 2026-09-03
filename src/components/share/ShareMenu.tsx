@@ -33,18 +33,6 @@ export default function ShareMenu({ title, url }: ShareMenuProps) {
     setOpen((prev) => !prev);
   };
 
-  // Prevent body scroll when menu is open on mobile
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
   const shareText = `${title}\n\nRead more on VibeStale: ${url}\n\n#VibeStale #NigeriaNews`;
 
   const links = [
@@ -91,13 +79,14 @@ export default function ShareMenu({ title, url }: ShareMenuProps) {
   ];
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative" ref={menuRef} style={{ zIndex: open ? 9999 : 'auto' }}>
       <button
         type="button"
         ref={buttonRef}
         onClick={toggleMenu}
-        className="p-2 text-gray-300 hover:text-white transition"
+        className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] transition-colors"
         aria-label="Share"
+        aria-expanded={open}
       >
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <circle cx="12" cy="5" r="2" />
@@ -107,30 +96,41 @@ export default function ShareMenu({ title, url }: ShareMenuProps) {
       </button>
 
       {open && (
-        <div
-          className={`absolute right-0 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 ${
-            dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
-          }`}
-        >
-          {links.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-gray-700 transition"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen(false);
-              }}
-            >
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white ${link.color}`}>
-                {link.icon}
-              </span>
-              {link.name}
-            </a>
-          ))}
-        </div>
+        <>
+          {/* Backdrop to prevent interaction with other elements */}
+          <div 
+            className="fixed inset-0 z-[9998]" 
+            onClick={() => setOpen(false)}
+          />
+          
+          {/* Dropdown menu */}
+          <div
+            className={`absolute right-0 w-52 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-2xl z-[9999] ${
+              dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
+            }`}
+          >
+            <div className="p-1.5">
+              {links.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(false);
+                  }}
+                >
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0 ${link.color}`}>
+                    {link.icon}
+                  </span>
+                  <span className="font-medium">{link.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

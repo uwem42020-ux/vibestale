@@ -1,25 +1,27 @@
+// components/Sidebar.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ChevronDown, Newspaper, Music, TrendingUp, Clock } from 'lucide-react';
 
 const headlineCategories = [
-  { slug: 'general', label: 'General' },
-  { slug: 'politics', label: 'Politics' },
-  { slug: 'business', label: 'Business' },
-  { slug: 'sports', label: 'Sports' },
-  { slug: 'tech', label: 'Tech' },
-  { slug: 'entertainment', label: 'Entertainment' },
+  { slug: 'general', label: 'General', icon: '📰' },
+  { slug: 'politics', label: 'Politics', icon: '🏛️' },
+  { slug: 'business', label: 'Business', icon: '💼' },
+  { slug: 'sports', label: 'Sports', icon: '⚽' },
+  { slug: 'tech', label: 'Tech', icon: '💻' },
+  { slug: 'entertainment', label: 'Entertainment', icon: '🎬' },
 ];
 
 const mediaCategories = [
-  { label: 'Music', href: '/music' },
-  { label: 'Music Videos', href: '/music-videos' },
-  { label: 'Celebrity News', href: '/music-news' },
-  { label: 'Movies', href: '/movies' },
-  { label: 'Live TV', href: '/live-tv' },
-  { label: 'Memes', href: '/memes' },
+  { label: 'Music', href: '/music', icon: '🎵' },
+  { label: 'Music Videos', href: '/music-videos', icon: '🎤' },
+  { label: 'Celebrity News', href: '/music-news', icon: '⭐' },
+  { label: 'Movies', href: '/movies', icon: '🎬' },
+  { label: 'Live TV', href: '/live-tv', icon: '📺' },
+  { label: 'Memes', href: '/memes', icon: '😂' },
 ];
 
 export default function Sidebar({ initialTime }: { initialTime?: string | null }) {
@@ -32,9 +34,6 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
     if (isMediaRoute) {
       setHeadlinesOpen(false);
       setMediaOpen(true);
-    } else if (pathname === '/' || pathname.startsWith('/category/')) {
-      setHeadlinesOpen(true);
-      setMediaOpen(false);
     } else {
       setHeadlinesOpen(true);
       setMediaOpen(false);
@@ -58,96 +57,90 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
   }).format(date);
 
   return (
-    <aside className="hidden md:block w-60 flex-shrink-0">
-      <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar space-y-1">
-        {/* Date/Time */}
-        <div className="mb-4">
-          <div className="text-xs text-gray-400">{dateString}</div>
-          <div className="text-lg font-semibold text-white">{timeString} WAT</div>
-          <div className="mt-4 border-t border-gray-700" />
+    <aside className="hidden md:block w-64 flex-shrink-0">
+      <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar space-y-4">
+        {/* Date/Time Card */}
+        <div className="bg-[var(--surface)] rounded-xl p-4 shadow-sm border border-[var(--border)]">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="w-4 h-4 text-[var(--accent)]" />
+            <span className="text-xs text-[var(--text-tertiary)]">{dateString}</span>
+          </div>
+          <div className="text-2xl font-bold text-[var(--text-primary)] font-space-grotesk">
+            {timeString} <span className="text-sm font-normal">WAT</span>
+          </div>
         </div>
 
-        {/* Headlines */}
-        <button
-          onClick={() => {
-            setHeadlinesOpen((prev) => !prev);
-            if (!headlinesOpen) setMediaOpen(false);
-          }}
-          className={`w-full flex items-center justify-between text-sm font-semibold px-4 py-2 rounded-lg ${
-            pathname === '/' ? 'bg-green-700 text-white' : 'text-gray-300 hover:text-white'
-          }`}
-        >
-          <span>Headlines</span>
-          <svg
-            className={`w-4 h-4 transition-transform ${headlinesOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Headlines Section */}
+        <div className="bg-[var(--surface)] rounded-xl overflow-hidden border border-[var(--border)]">
+          <button
+            onClick={() => setHeadlinesOpen(!headlinesOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-hover)] transition-colors"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+            <span className="flex items-center gap-2">
+              <Newspaper className="w-4 h-4 text-[var(--accent)]" />
+              <span className="text-sm font-semibold text-[var(--text-primary)]">Headlines</span>
+            </span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${headlinesOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-        {headlinesOpen && (
-          <div className="ml-4 flex flex-col gap-1">
-            {headlineCategories.map((cat) => {
-              const active = pathname === `/category/${cat.slug}`;
-              return (
-                <Link
-                  key={cat.slug}
-                  href={`/category/${cat.slug}`}
-                  className={`block px-3 py-1.5 rounded-lg text-sm transition ${
-                    active
-                      ? 'bg-green-700 text-white font-semibold'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
-                  {cat.label}
-                </Link>
-              );
-            })}
-          </div>
-        )}
+          {headlinesOpen && (
+            <div className="px-2 pb-2 space-y-1">
+              {headlineCategories.map((cat) => {
+                const active = pathname === `/category/${cat.slug}`;
+                return (
+                  <Link
+                    key={cat.slug}
+                    href={`/category/${cat.slug}`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                      active
+                        ? 'bg-[var(--accent)] text-white font-semibold shadow-md'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    <span className="text-lg">{cat.icon}</span>
+                    <span>{cat.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-        {/* Media */}
-        <button
-          onClick={() => {
-            setMediaOpen((prev) => !prev);
-            if (!mediaOpen) setHeadlinesOpen(false);
-          }}
-          className="w-full flex items-center justify-between text-sm font-semibold text-gray-300 hover:text-white px-4 py-2 rounded-lg"
-        >
-          <span>Media</span>
-          <svg
-            className={`w-4 h-4 transition-transform ${mediaOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Media Section */}
+        <div className="bg-[var(--surface)] rounded-xl overflow-hidden border border-[var(--border)]">
+          <button
+            onClick={() => setMediaOpen(!mediaOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-hover)] transition-colors"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+            <span className="flex items-center gap-2">
+              <Music className="w-4 h-4 text-[var(--accent)]" />
+              <span className="text-sm font-semibold text-[var(--text-primary)]">Media</span>
+            </span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${mediaOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-        {mediaOpen && (
-          <div className="ml-4 flex flex-col gap-1">
-            {mediaCategories.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block px-3 py-1.5 rounded-lg text-sm transition ${
-                    active
-                      ? 'bg-green-700 text-white font-semibold'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        )}
+          {mediaOpen && (
+            <div className="px-2 pb-2 space-y-1">
+              {mediaCategories.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                      active
+                        ? 'bg-[var(--accent)] text-white font-semibold shadow-md'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );
