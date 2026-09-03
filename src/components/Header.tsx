@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +41,7 @@ export default function Header() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
         <Link href="/" className="flex-shrink-0">
           <img
             src="/whitelogo.png"
@@ -51,8 +54,22 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex space-x-6 text-sm">
-          <Link href="/media" className="text-gray-200 hover:text-white font-medium">Media</Link>
-          <Link href="/music" className="text-gray-200 hover:text-white font-medium">Music</Link>
+          <Link
+            href="/"
+            className={`font-medium transition ${
+              pathname === '/' ? 'text-green-400' : 'text-gray-200 hover:text-white'
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            href="/about"
+            className={`font-medium transition ${
+              pathname === '/about' ? 'text-green-400' : 'text-gray-200 hover:text-white'
+            }`}
+          >
+            About
+          </Link>
         </nav>
 
         {/* Mobile hamburger */}
@@ -74,16 +91,13 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile dropdown overlay */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <>
-          {/* Backdrop blur overlay */}
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
             onClick={() => setMenuOpen(false)}
           />
-
-          {/* Dropdown */}
           <div className="absolute left-0 right-0 top-full bg-black/80 backdrop-blur-lg border-b border-gray-800 z-50 md:hidden">
             <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
               <img
@@ -103,19 +117,15 @@ export default function Header() {
               </button>
             </div>
             <nav className="flex flex-col gap-3 px-5 py-4">
+              {/* Only About on mobile dropdown */}
               <Link
-                href="/media"
-                className="text-base text-white hover:text-green-400 transition"
+                href="/about"
+                className={`text-base transition ${
+                  pathname === '/about' ? 'text-green-400 font-semibold' : 'text-white hover:text-green-400'
+                }`}
                 onClick={() => setMenuOpen(false)}
               >
-                Media
-              </Link>
-              <Link
-                href="/music"
-                className="text-base text-white hover:text-green-400 transition"
-                onClick={() => setMenuOpen(false)}
-              >
-                Music
+                About
               </Link>
             </nav>
           </div>

@@ -8,16 +8,11 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/', label: 'Home', icon: '🏠' },
-    { href: '/category/general', label: 'General', icon: '📰' },
-    { href: '/category/tech', label: 'Tech', icon: '💻' },
-    { href: '/category/sports', label: 'Sports', icon: '⚽' },
-    { href: '/media', label: 'Media', icon: '🎬' },
-    { href: '/music', label: 'Music', icon: '🎵' },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50 md:hidden">
-      <div className="grid grid-cols-6 h-16">
+      <div className="grid grid-cols-1 h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (

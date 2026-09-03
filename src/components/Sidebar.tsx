@@ -27,7 +27,6 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
   const [headlinesOpen, setHeadlinesOpen] = useState(true);
   const [mediaOpen, setMediaOpen] = useState(false);
 
-  // Automatically set open state based on route
   useEffect(() => {
     const isMediaRoute = mediaCategories.some((item) => pathname.startsWith(item.href));
     if (isMediaRoute) {
@@ -42,16 +41,33 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
     }
   }, [pathname]);
 
+  const date = initialTime ? new Date(initialTime) : new Date();
+  const dateString = new Intl.DateTimeFormat('en-NG', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'Africa/Lagos',
+  }).format(date);
+
+  const timeString = new Intl.DateTimeFormat('en-NG', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZone: 'Africa/Lagos',
+  }).format(date);
+
   return (
     <aside className="hidden md:block w-60 flex-shrink-0">
       <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar space-y-1">
         {/* Date/Time */}
         <div className="mb-4">
-          <div className="text-xs text-gray-300">{initialTime || ''}</div>
+          <div className="text-xs text-gray-400">{dateString}</div>
+          <div className="text-lg font-semibold text-white">{timeString} WAT</div>
           <div className="mt-4 border-t border-gray-700" />
         </div>
 
-        {/* Headlines button (goes to home) */}
+        {/* Headlines */}
         <button
           onClick={() => {
             setHeadlinesOpen((prev) => !prev);
@@ -93,7 +109,7 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
           </div>
         )}
 
-        {/* Media dropdown */}
+        {/* Media */}
         <button
           onClick={() => {
             setMediaOpen((prev) => !prev);
@@ -111,6 +127,7 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
+
         {mediaOpen && (
           <div className="ml-4 flex flex-col gap-1">
             {mediaCategories.map((item) => {
