@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import HeadlineCard from '@/components/feed/HeadlineCard';
-import FeaturedHeadlineCard from '@/components/feed/FeaturedHeadlineCard';
+import HeadlinesList from '@/components/feed/HeadlinesList';
 import Sidebar from '@/components/Sidebar';
 import LiveClock from '@/components/LiveClock';
 import Link from 'next/link';
@@ -36,7 +35,7 @@ export default async function HomePage() {
     .eq('status', 'published')
     .is('deleted_at', null)
     .order('published_at', { ascending: false })
-    .limit(20);
+    .limit(10);
 
   if (error) {
     console.error('Error fetching headlines:', error);
@@ -61,8 +60,6 @@ export default async function HomePage() {
     );
   }
 
-  const [featured, ...rest] = headlines;
-
   return (
     <div className="md:flex md:gap-8">
       <Sidebar initialTime={serverNow} />
@@ -72,7 +69,7 @@ export default async function HomePage() {
         <div className="md:hidden mb-4">
           <LiveClock initialTime={serverNow} />
         </div>
-        
+
         {/* Mobile Category Navigation */}
         <div className="md:hidden mb-6 relative">
           <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
@@ -80,18 +77,18 @@ export default async function HomePage() {
               Headlines
             </span>
             {headlineCategories.map((cat) => (
-              <Link 
-                key={cat.slug} 
-                href={`/category/${cat.slug}`} 
+              <Link
+                key={cat.slug}
+                href={`/category/${cat.slug}`}
                 className="flex-shrink-0 px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all"
               >
                 {cat.label}
               </Link>
             ))}
             {mediaCategories.map((item) => (
-              <Link 
-                key={item.href} 
-                href={item.href} 
+              <Link
+                key={item.href}
+                href={item.href}
                 className="flex-shrink-0 px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all"
               >
                 {item.label}
@@ -112,27 +109,8 @@ export default async function HomePage() {
             </span>
           </div>
 
-          {/* Featured Article */}
-          <div className="mb-6">
-            <FeaturedHeadlineCard headline={featured} />
-          </div>
-
-          {/* Rest of Headlines */}
-          <div className="space-y-4">
-            {rest.map((headline) => (
-              <HeadlineCard key={headline.id} headline={headline} />
-            ))}
-          </div>
-
-          {/* Load More Button */}
-          <div className="mt-8 text-center">
-            <button className="inline-flex items-center gap-2 px-8 py-3 bg-[var(--surface)] text-[var(--text-primary)] font-semibold rounded-xl border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all shadow-sm hover:shadow-lg">
-              Load More Stories
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
+          {/* Headlines list with Load More */}
+          <HeadlinesList initialHeadlines={headlines} />
         </div>
 
         {/* Trending Section */}
@@ -147,12 +125,10 @@ export default async function HomePage() {
                 href={`/headline/${headline.slug}`}
                 className="flex items-center gap-4 p-4 hover:bg-[var(--surface-hover)] transition-colors border-b border-[var(--border)] last:border-b-0 group"
               >
-                {/* Number */}
                 <span className="text-2xl font-bold text-[var(--accent)] w-8 text-center flex-shrink-0">
                   {index + 1}
                 </span>
 
-                {/* Image */}
                 {headline.image_url ? (
                   <img
                     src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
@@ -169,7 +145,6 @@ export default async function HomePage() {
                   </div>
                 )}
 
-                {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
                     {headline.title}

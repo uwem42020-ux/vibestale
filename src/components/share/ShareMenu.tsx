@@ -98,11 +98,11 @@ export default function ShareMenu({ title, url }: ShareMenuProps) {
       {open && (
         <>
           {/* Backdrop to prevent interaction with other elements */}
-          <div 
-            className="fixed inset-0 z-[9998]" 
+          <div
+            className="fixed inset-0 z-[9998]"
             onClick={() => setOpen(false)}
           />
-          
+
           {/* Dropdown menu */}
           <div
             className={`absolute right-0 w-52 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-2xl z-[9999] ${

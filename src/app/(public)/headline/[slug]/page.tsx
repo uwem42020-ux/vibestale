@@ -21,14 +21,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!headline) return { title: 'Not Found' };
 
+  const imageUrl = headline.image_url
+    ? `/api/image?url=${encodeURIComponent(headline.image_url)}`
+    : '/whitelogo.png';
+
+  const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}/headline/${headline.slug}`;
+
   return {
     title: `${headline.title} | VibeStale`,
     description: headline.ai_summary?.substring(0, 155) || '',
     openGraph: {
       title: headline.title,
       description: headline.ai_summary || '',
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/headline/${headline.slug}`,
+      url: fullUrl,
       type: 'article',
+      siteName: 'VibeStale',
+      images: [
+        {
+          url: imageUrl.startsWith('http') ? imageUrl : `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`,
+          width: 1200,
+          height: 630,
+          alt: headline.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: headline.title,
+      description: headline.ai_summary || '',
+      images: [imageUrl.startsWith('http') ? imageUrl : `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`],
     },
   };
 }
