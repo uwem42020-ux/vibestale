@@ -12,13 +12,13 @@ export async function GET(req: Request) {
 
   const supabase = await createClient();
 
-  // Process News Headlines (newest first, limit 5)
+  // Process News Headlines (newest first, limit 10)
   const { data: pendingHeadlines, error: headlineError } = await supabase
     .from('headlines')
     .select('id, title, original_url')
     .eq('ai_analysis_status', 'pending')
     .order('fetched_at', { ascending: false })
-    .limit(5);
+    .limit(10);
 
   if (headlineError) {
     console.error('Error fetching pending headlines:', headlineError);
@@ -65,13 +65,13 @@ export async function GET(req: Request) {
     }
   }
 
-  // Process Entertainment News (newest first, limit 5)
+  // Process Entertainment News (newest first, limit 10)
   const { data: pendingEntertainment, error: entertainmentError } = await supabase
     .from('entertainment_news')
     .select('id, title, original_url')
     .eq('ai_analysis_status', 'pending')
     .order('fetched_at', { ascending: false })
-    .limit(5);
+    .limit(10);
 
   if (entertainmentError) {
     console.error('Error fetching pending entertainment:', entertainmentError);

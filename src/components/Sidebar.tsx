@@ -1,4 +1,3 @@
-// components/Sidebar.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -18,7 +17,6 @@ const headlineCategories = [
 const mediaCategories = [
   { label: 'Music', href: '/music', icon: '🎵' },
   { label: 'Music Videos', href: '/music-videos', icon: '🎤' },
-  { label: 'Celebrity News', href: '/music-news', icon: '⭐' },
   { label: 'Movies', href: '/movies', icon: '🎬' },
   { label: 'Live TV', href: '/live-tv', icon: '📺' },
   { label: 'Memes', href: '/memes', icon: '😂' },
