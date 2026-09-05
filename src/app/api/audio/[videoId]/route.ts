@@ -6,18 +6,17 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const PROXY_URL = process.env.PROXY_URL; // e.g., "https://yt-proxy.onrender.com"
+const PROXY_URL = process.env.PROXY_URL;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
-  const videoId = params.videoId;
+  const { videoId } = await params;
   if (!videoId) {
     return NextResponse.json({ error: 'Missing video ID' }, { status: 400 });
   }
 
-  // 1. Check cache
   const { data: track, error: fetchError } = await supabase
     .from('audio_tracks')
     .select('audio_url, audio_url_expires_at')
@@ -39,7 +38,6 @@ export async function GET(
     });
   }
 
-  // 2. Call proxy
   try {
     const proxyResponse = await fetch(`${PROXY_URL}/audio/${videoId}`);
     if (!proxyResponse.ok) throw new Error(`Proxy error ${proxyResponse.status}`);
@@ -47,7 +45,7 @@ export async function GET(
     const audioUrl = data.audioUrl;
     if (!audioUrl) throw new Error('No audioUrl');
 
-    const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(); // 6 hours
+    const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
 
     const { error: updateError } = await supabase
       .from('audio_tracks')
