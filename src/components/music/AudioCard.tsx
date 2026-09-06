@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Heart, AlertCircle, Download } from 'lucide-react';
+import { Play, Pause, Heart, AlertCircle } from 'lucide-react';
 
 type Track = {
   id: string;
@@ -9,7 +9,7 @@ type Track = {
   artist: string | null;
   youtube_video_id: string;
   thumbnail_url?: string | null;
-  audio_url?: string | null; // optional pre-stored URL
+  audio_url?: string | null; // optional pre-stored URL for future production
 };
 
 export default function AudioCard({ track }: { track: Track }) {
@@ -169,15 +169,6 @@ export default function AudioCard({ track }: { track: Track }) {
             </div>
           )}
         </div>
-
-        <a
-          href={`/api/audio/${track.youtube_video_id}/download`}
-          download
-          className="p-2 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--accent)] hover:bg-[var(--surface-hover)] transition-colors"
-          aria-label="Download track"
-        >
-          <Download className="w-4 h-4" />
-        </a>
 
         <button
           onClick={() => setLiked(!liked)}

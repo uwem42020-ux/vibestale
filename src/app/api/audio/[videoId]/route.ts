@@ -6,7 +6,28 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const PROXY_URL = process.env.PROXY_URL;
+const PIPED_INSTANCES = [
+  'https://pipedapi.kavin.rocks',
+  'https://pipedapi.tokhmi.xyz',
+  'https://pipedapi.moomoo.me',
+  'https://pipedapi.syncpundit.io',
+];
+
+async function getPipedAudioUrl(videoId: string): Promise<string> {
+  for (const instance of PIPED_INSTANCES) {
+    try {
+      const response = await fetch(`${instance}/streams/${videoId}`);
+      if (!response.ok) continue;
+      const data = await response.json();
+      if (data.audioStreams && data.audioStreams.length > 0) {
+        return data.audioStreams[0].url;
+      }
+    } catch (err) {
+      console.error(`Piped instance ${instance} failed:`, err);
+    }
+  }
+  throw new Error('All Piped instances failed');
+}
 
 export async function GET(
   request: NextRequest,
@@ -17,34 +38,31 @@ export async function GET(
     return NextResponse.json({ error: 'Missing video ID' }, { status: 400 });
   }
 
-  const { data: track, error: fetchError } = await supabase
-    .from('audio_tracks')
-    .select('audio_url, audio_url_expires_at')
-    .eq('youtube_video_id', videoId)
-    .single();
-
-  if (fetchError) {
-    console.warn('Supabase fetch error (continuing):', fetchError.message);
-  }
-
-  if (
-    track?.audio_url &&
-    track?.audio_url_expires_at &&
-    new Date(track.audio_url_expires_at).getTime() > Date.now() + 60 * 1000
-  ) {
-    return NextResponse.json({
-      audioUrl: track.audio_url,
-      expiresAt: track.audio_url_expires_at,
-    });
-  }
-
   try {
-    const proxyResponse = await fetch(`${PROXY_URL}/audio/${videoId}`);
-    if (!proxyResponse.ok) throw new Error(`Proxy error ${proxyResponse.status}`);
-    const data = await proxyResponse.json();
-    const audioUrl = data.audioUrl;
-    if (!audioUrl) throw new Error('No audioUrl');
+    // Check cache
+    const { data: track, error: fetchError } = await supabase
+      .from('audio_tracks')
+      .select('audio_url, audio_url_expires_at')
+      .eq('youtube_video_id', videoId)
+      .single();
 
+    if (fetchError) {
+      console.warn('Supabase fetch error (continuing):', fetchError.message);
+    }
+
+    if (
+      track?.audio_url &&
+      track?.audio_url_expires_at &&
+      new Date(track.audio_url_expires_at).getTime() > Date.now() + 60 * 1000
+    ) {
+      return NextResponse.json({
+        audioUrl: track.audio_url,
+        expiresAt: track.audio_url_expires_at,
+      });
+    }
+
+    // Fetch fresh
+    const audioUrl = await getPipedAudioUrl(videoId);
     const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
 
     const { error: updateError } = await supabase
@@ -60,7 +78,7 @@ export async function GET(
 
     return NextResponse.json({ audioUrl, expiresAt });
   } catch (error) {
-    console.error('Proxy fetch error:', error);
+    console.error('Audio API error:', error);
     return NextResponse.json({ error: 'Failed to get audio URL' }, { status: 500 });
   }
 }
