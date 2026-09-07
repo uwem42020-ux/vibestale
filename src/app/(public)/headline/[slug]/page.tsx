@@ -30,12 +30,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${headline.title} | VibeStale`,
     description: headline.ai_summary?.substring(0, 155) || '',
+    alternates: {
+      canonical: fullUrl,
+    },
     openGraph: {
       title: headline.title,
       description: headline.ai_summary || '',
       url: fullUrl,
       type: 'article',
       siteName: 'VibeStale',
+      publishedTime: headline.published_at || undefined,
+      modifiedTime: headline.published_at || undefined,
       images: [
         {
           url: imageUrl.startsWith('http') ? imageUrl : `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`,
@@ -70,9 +75,38 @@ export default async function HeadlinePage({ params }: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
 
+  // JSON-LD structured data for NewsArticle
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: headline.title,
+    image: headline.image_url
+      ? [`${baseUrl}/api/image?url=${encodeURIComponent(headline.image_url)}`]
+      : [`${baseUrl}/whitelogo.png`],
+    datePublished: headline.published_at,
+    dateModified: headline.updated_at || headline.published_at,
+    author: {
+      '@type': 'Organization',
+      name: headline.sources?.name || 'VibeStale',
+      url: headline.sources?.base_url || baseUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'VibeStale',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${baseUrl}/blacklogo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': shareUrl,
+    },
+  };
+
   // Placeholder image URLs – replace with your actual ad image URLs
-  const bannerAdImage = '/ads/banner-ad.png';       // small horizontal banner
-  const portraitAdImage = '/ads/portrait-ad.png';   // long vertical ad
+  const bannerAdImage = '/advert%20design.png';       // small horizontal banner
+  const portraitAdImage = '/Advertise%20with%20vibestale.png';   // long vertical ad
 
   // Ad components with images
   const BannerAd = () => (
@@ -112,6 +146,12 @@ export default async function HeadlinePage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Inject JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Mobile banner ad before article image */}
       <BannerAd />
 
@@ -148,11 +188,12 @@ export default async function HeadlinePage({ params }: Props) {
             )}
 
             <div className="p-6 sm:p-8">
-              {/* Title, meta, analysis, actions – same as before */}
+              {/* Title */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4 font-space-grotesk leading-tight">
                 {headline.title}
               </h1>
 
+              {/* Meta */}
               <div className="flex items-center gap-3 mb-6 text-sm text-[var(--text-tertiary)] flex-wrap">
                 {headline.sources && (
                   <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
@@ -181,6 +222,7 @@ export default async function HeadlinePage({ params }: Props) {
                 )}
               </div>
 
+              {/* Analysis */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                   <span className="w-1 h-6 bg-[var(--accent)] rounded-full" />
@@ -195,6 +237,7 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
+              {/* Actions */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-6 border-t border-[var(--border)]">
                 <a
                   href={headline.original_url}
@@ -224,7 +267,7 @@ export default async function HeadlinePage({ params }: Props) {
               className="block overflow-hidden rounded-xl border border-[var(--border)]"
             >
               <img
-                src="/ads/sidebar-ad.png"
+                src="/Advertise%20with%20vibestale.png"
                 alt="Advertisement"
                 className="w-full h-auto object-cover"
               />

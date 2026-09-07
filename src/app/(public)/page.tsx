@@ -5,6 +5,7 @@ import LiveClock from '@/components/LiveClock';
 import Link from 'next/link';
 import SourceBadge from '@/components/SourceBadge';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,9 +27,36 @@ const navCategories: NavItem[] = [
   { label: 'Live News', href: '/live-news' },
 ];
 
+export async function generateMetadata(): Promise<Metadata> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vibestale.com';
+  return {
+    title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+    description:
+      'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+    alternates: {
+      canonical: baseUrl,
+    },
+    openGraph: {
+      title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+      description:
+        'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+      type: 'website',
+      url: baseUrl,
+      siteName: 'VibeStale',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+      description:
+        'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+    },
+  };
+}
+
 export default async function HomePage() {
   const supabase = await createClient();
   const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vibestale.com';
 
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
@@ -87,7 +115,7 @@ export default async function HomePage() {
     .order('published_at', { ascending: false })
     .limit(2);
 
-  // 5. Naija Latest: category = general, top 2 (you can change this to any logic)
+  // 5. Naija Latest: category = general, top 2
   const { data: naijaLatest } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -127,7 +155,7 @@ export default async function HomePage() {
     return { ...item, arrow };
   });
 
-  // Helper component for a compact list row (used in sidebar sections)
+  // Compact row for sidebar sections
   const CompactItem = ({ item, showArrow = false }: { item: any; showArrow?: boolean }) => (
     <Link
       href={`/headline/${item.slug}`}
@@ -161,7 +189,7 @@ export default async function HomePage() {
     </Link>
   );
 
-  // Small advert banner component
+  // Small advert banner
   const SmallAdvertBanner = () => (
     <div className="w-full rounded-xl overflow-hidden border border-[var(--border)]">
       <img
@@ -172,145 +200,174 @@ export default async function HomePage() {
     </div>
   );
 
+  // Structured data
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'VibeStale',
+    url: baseUrl,
+    logo: `${baseUrl}/blacklogo.png`,
+    sameAs: [
+      'https://facebook.com/vibestale',
+      'https://twitter.com/vibestale',
+      'https://instagram.com/vibestale',
+    ],
+  };
+
+  const webSiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'VibeStale',
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
-    <div className="md:flex md:gap-8">
-      {/* Portrait advert banner (desktop left sidebar) */}
-      <PortraitAdBanner />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
+      />
 
-      <div className="flex-1 min-w-0">
-        {/* Mobile date + nav */}
-        <div className="md:hidden mb-4">
-          <LiveClock initialTime={serverNow} />
-        </div>
-        <div className="md:hidden mb-6 relative">
-          <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
-            <span className="flex-shrink-0 px-4 py-2 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md">
-              Headlines
-            </span>
-            {navCategories.map((item) => {
-              const href = 'slug' in item ? `/category/${item.slug}` : item.href;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex-shrink-0 px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all"
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+      <div className="md:flex md:gap-8">
+        <PortraitAdBanner />
+
+        <div className="flex-1 min-w-0">
+          {/* Mobile date + nav */}
+          <div className="md:hidden mb-4">
+            <LiveClock initialTime={serverNow} />
           </div>
-          <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
-        </div>
+          <div className="md:hidden mb-6 relative">
+            <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
+              <span className="flex-shrink-0 px-4 py-2 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md">
+                Headlines
+              </span>
+              {navCategories.map((item) => {
+                const href = 'slug' in item ? `/category/${item.slug}` : item.href;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="flex-shrink-0 px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all"
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
+          </div>
 
-        {/* Mobile Trending slider */}
-        <div className="md:hidden mb-6">
-          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-            Trending News
-          </h2>
-          <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
-            {trendingWithArrows.map((headline) => (
-              <Link key={headline.id} href={`/headline/${headline.slug}`} className="flex-shrink-0 w-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-3">
-                <div className="flex items-center gap-1 mb-1">
-                  {headline.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
-                  {headline.arrow === 'down' && <TrendingDown className="w-4 h-4 text-red-500 animate-pulse" />}
-                  {headline.sources && (
-                    <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
-                  )}
-                </div>
-                {headline.image_url ? (
-                  <img src={`/api/image?url=${encodeURIComponent(headline.image_url)}`} alt={headline.title} className="w-full h-24 object-cover rounded-lg mb-2" loading="lazy" referrerPolicy="no-referrer" />
-                ) : (
-                  <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg mb-2 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          {/* Mobile Trending slider */}
+          <div className="md:hidden mb-6">
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
+              Trending News
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+              {trendingWithArrows.map((headline) => (
+                <Link key={headline.id} href={`/headline/${headline.slug}`} className="flex-shrink-0 w-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-3">
+                  <div className="flex items-center gap-1 mb-1">
+                    {headline.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
+                    {headline.arrow === 'down' && <TrendingDown className="w-4 h-4 text-red-500 animate-pulse" />}
+                    {headline.sources && (
+                      <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
+                    )}
                   </div>
-                )}
-                <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2">{headline.title}</span>
-              </Link>
-            ))}
+                  {headline.image_url ? (
+                    <img src={`/api/image?url=${encodeURIComponent(headline.image_url)}`} alt={headline.title} className="w-full h-24 object-cover rounded-lg mb-2" loading="lazy" referrerPolicy="no-referrer" />
+                  ) : (
+                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg mb-2 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2">{headline.title}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-4">
+              <SmallAdvertBanner />
+            </div>
           </div>
-          <div className="mt-4">
-            <SmallAdvertBanner />
-          </div>
-        </div>
 
-        {/* Desktop: Main content + Sidebar with multiple sections */}
-        <div className="hidden md:flex md:gap-8">
-          {/* Main headlines */}
-          <div className="flex-1 min-w-0">
+          {/* Desktop: Main content + Sidebar with multiple sections */}
+          <div className="hidden md:flex md:gap-8">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h1>
+                <span className="text-sm text-[var(--text-tertiary)]">{headlines.length} stories</span>
+              </div>
+              <HeadlinesList initialHeadlines={headlines} />
+            </div>
+
+            <aside className="w-80 flex-shrink-0">
+              <div className="space-y-6">
+                <SmallAdvertBanner />
+
+                <section>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
+                    Breaking News
+                  </h2>
+                  <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                    {(breakingNews ?? []).map((item) => (
+                      <CompactItem key={item.id} item={item} />
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
+                    Trending News
+                  </h2>
+                  <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                    {trendingWithArrows.map((item) => (
+                      <CompactItem key={item.id} item={item} showArrow />
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
+                    Sports Update
+                  </h2>
+                  <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                    {(sportsNews ?? []).map((item) => (
+                      <CompactItem key={item.id} item={item} />
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
+                    Naija Latest
+                  </h2>
+                  <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                    {(naijaLatest ?? []).map((item) => (
+                      <CompactItem key={item.id} item={item} />
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </aside>
+          </div>
+
+          {/* Mobile main list */}
+          <div className="md:hidden">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h1>
+              <h1 className="text-2xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h1>
               <span className="text-sm text-[var(--text-tertiary)]">{headlines.length} stories</span>
             </div>
             <HeadlinesList initialHeadlines={headlines} />
           </div>
-
-          {/* Sidebar: no sticky, multiple sections */}
-          <aside className="w-80 flex-shrink-0">
-            <div className="space-y-6">
-              {/* Small advert */}
-              <SmallAdvertBanner />
-
-              {/* Breaking News */}
-              <section>
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-                  Breaking News
-                </h2>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
-                  {(breakingNews ?? []).map((item) => (
-                    <CompactItem key={item.id} item={item} />
-                  ))}
-                </div>
-              </section>
-
-              {/* Trending News */}
-              <section>
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-                  Trending News
-                </h2>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
-                  {trendingWithArrows.map((item) => (
-                    <CompactItem key={item.id} item={item} showArrow />
-                  ))}
-                </div>
-              </section>
-
-              {/* Sports Update */}
-              <section>
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-                  Sports Update
-                </h2>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
-                  {(sportsNews ?? []).map((item) => (
-                    <CompactItem key={item.id} item={item} />
-                  ))}
-                </div>
-              </section>
-
-              {/* Naija Latest */}
-              <section>
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-                  Naija Latest
-                </h2>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
-                  {(naijaLatest ?? []).map((item) => (
-                    <CompactItem key={item.id} item={item} />
-                  ))}
-                </div>
-              </section>
-            </div>
-          </aside>
-        </div>
-
-        {/* Mobile: Main list */}
-        <div className="md:hidden">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h1>
-            <span className="text-sm text-[var(--text-tertiary)]">{headlines.length} stories</span>
-          </div>
-          <HeadlinesList initialHeadlines={headlines} />
         </div>
       </div>
-    </div>
+    </>
   );
 }
