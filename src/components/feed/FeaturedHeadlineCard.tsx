@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
 import ShareMenu from '@/components/share/ShareMenu';
 import { ExternalLink, Clock, TrendingUp } from 'lucide-react';
@@ -54,11 +55,13 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
         <Link href={`/headline/${headline.slug}`} className="block relative">
           {headline.image_url ? (
             <>
-              <img
+              <Image
                 src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                 alt={headline.title}
                 className="w-full h-56 sm:h-72 lg:h-80 object-cover"
-                loading="lazy"
+                width={1200}
+                height={630}
+                priority
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

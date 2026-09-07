@@ -3,6 +3,7 @@ import CategoryHeadlinesList from '@/components/feed/CategoryHeadlinesList';
 import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
 import Link from 'next/link';
+import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -175,10 +176,12 @@ export default async function CategoryPage({ params }: Props) {
         </h3>
       </div>
       {item.image_url && (
-        <img
+        <Image
           src={`/api/image?url=${encodeURIComponent(item.image_url)}`}
           alt={item.title}
           className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+          width={48}
+          height={48}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -189,10 +192,13 @@ export default async function CategoryPage({ params }: Props) {
   // Small advert banner
   const SmallAdvertBanner = () => (
     <div className="w-full rounded-xl overflow-hidden border border-[var(--border)]">
-      <img
+      <Image
         src="/advert%20design.png"
         alt="Advertisement"
         className="w-full h-auto object-cover"
+        width={320}
+        height={100}
+        loading="lazy"
       />
     </div>
   );
@@ -274,10 +280,12 @@ export default async function CategoryPage({ params }: Props) {
                     {item.sources && <SourceBadge name={item.sources.name} baseUrl={item.sources.base_url} />}
                   </div>
                   {item.image_url ? (
-                    <img
+                    <Image
                       src={`/api/image?url=${encodeURIComponent(item.image_url)}`}
                       alt={item.title}
                       className="w-full h-24 object-cover rounded-lg mb-2"
+                      width={192}
+                      height={96}
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />

@@ -1,9 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    localPatterns: [
+      {
+        // Match any local image path without a query string
+        pathname: '/**',
+      },
+      {
+        // Match the /api/image proxy with any query string (e.g., ?url=...)
+        pathname: '/api/image',
+        search: '**',
+      },
+    ],
+  },
   async redirects() {
     return [
-      // Old media routes
       { source: '/music', destination: '/', permanent: true },
       { source: '/music-videos', destination: '/', permanent: true },
       { source: '/movies', destination: '/', permanent: true },

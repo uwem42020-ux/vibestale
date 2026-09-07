@@ -90,9 +90,9 @@ export default function LiveClock({ initialTime }: LiveClockProps) {
   }).format(now);
 
   return (
-    <div className="text-xs text-gray-300 flex flex-col gap-0.5">
+    <div className="text-xs text-[var(--text-secondary)] flex flex-col gap-0.5">
       <span>{dateString}</span>
-      <span className="font-semibold text-white">{timeString} WAT</span>
+      <span className="font-semibold text-[var(--text-primary)]">{timeString} WAT</span>
     </div>
   );
 }

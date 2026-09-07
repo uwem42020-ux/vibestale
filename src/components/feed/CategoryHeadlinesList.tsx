@@ -1,16 +1,26 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useRef } from 'react';
 import HeadlineCard from './HeadlineCard';
 
 type Item = any; // your actual headline type
 
 export default function CategoryHeadlinesList({ initialItems, slug }: { initialItems: Item[]; slug: string }) {
-  const [items, setItems] = useState<Item[]>(initialItems);
+  // Deduplicate initial items by ID
+  const [items, setItems] = useState<Item[]>(() => {
+    const seen = new Set<string>();
+    return initialItems.filter((item) => {
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
+  });
+
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const loadMore = async () => {
     if (loading || noMore) return;
@@ -26,12 +36,33 @@ export default function CategoryHeadlinesList({ initialItems, slug }: { initialI
       setNoMore(true);
     } else {
       startTransition(() => {
-        setItems((prev) => [...prev, ...data.items]);
+        setItems((prev) => {
+          const existingIds = new Set(prev.map((item) => item.id));
+          const uniqueNew = data.items.filter((item: any) => !existingIds.has(item.id));
+          return [...prev, ...uniqueNew];
+        });
         setPage(nextPage);
       });
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const currentSentinel = sentinelRef.current;
+    if (!currentSentinel || noMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && !noMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(currentSentinel);
+    return () => observer.disconnect();
+  }, [loading, noMore, page]);
 
   return (
     <div>
@@ -41,22 +72,19 @@ export default function CategoryHeadlinesList({ initialItems, slug }: { initialI
         ))}
       </div>
 
-      <div className="mt-8 text-center">
-        {!noMore ? (
-          <button
-            onClick={loadMore}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gray-800 text-white font-semibold rounded-xl border border-gray-700 hover:bg-gray-700 disabled:opacity-50"
-          >
-            {loading ? 'Loading...' : 'Load More'}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        ) : (
-          <p className="text-sm text-gray-500">No more headlines</p>
-        )}
-      </div>
+      <div ref={sentinelRef} className="h-10" />
+
+      {loading && (
+        <div className="text-center py-4">
+          <span className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[var(--accent)] border-t-transparent" />
+        </div>
+      )}
+
+      {noMore && (
+        <p className="text-sm text-[var(--text-tertiary)] text-center mt-4">
+          No more headlines
+        </p>
+      )}
     </div>
   );
 }

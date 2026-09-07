@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
 import ShareMenu from '@/components/share/ShareMenu';
 import { ExternalLink, Clock, Bookmark } from 'lucide-react';
@@ -47,10 +48,12 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
         >
           {headline.image_url ? (
             <>
-              <img
+              <Image
                 src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                 alt={headline.title}
                 className="w-24 h-24 sm:w-32 sm:h-32 object-cover"
+                width={128}
+                height={128}
                 loading="lazy"
                 referrerPolicy="no-referrer"
               />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 import { Sun, Moon, X, LayoutGrid } from 'lucide-react';
@@ -46,12 +47,13 @@ export default function Header() {
         {/* Logo left */}
         <div className="flex items-center justify-between">
           <Link href="/" className="flex-shrink-0 group z-10">
-            <img
+            <Image
               src={theme === 'dark' ? '/whitelogo.png' : '/blacklogo.png'}
               alt="VibeStale"
               className="h-10 w-auto transition-transform group-hover:scale-105"
-              width={2172}
-              height={724}
+              width={120}
+              height={40}
+              priority
             />
           </Link>
 

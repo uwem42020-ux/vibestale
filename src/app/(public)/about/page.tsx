@@ -15,6 +15,8 @@ import {
   Target,
 } from 'lucide-react';
 
+export const revalidate = 3600; // ISR: regenerate every hour
+
 export const metadata: Metadata = {
   title: 'About VibeStale | AI-Powered Nigerian News',
   description:

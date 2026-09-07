@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 type LiveTVChannel = {
   name: string;
@@ -60,10 +61,12 @@ export default function LiveTVCard({ channel }: { channel: LiveTVChannel }) {
           className="relative block w-full aspect-video bg-black"
         >
           {channel.logo ? (
-            <img
+            <Image
               src={channel.logo}
               alt={channel.name}
               className="w-full h-full object-cover opacity-80"
+              width={320}
+              height={180}
               loading="lazy"
             />
           ) : (

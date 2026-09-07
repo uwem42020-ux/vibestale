@@ -1,8 +1,9 @@
-// app/(public)/privacy/page.tsx
 import type { Metadata } from 'next';
 import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
 import { Shield, Lock, Eye, Database, Mail, FileText } from 'lucide-react';
+
+export const revalidate = 3600; // ISR: regenerate every hour
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | VibeStale',

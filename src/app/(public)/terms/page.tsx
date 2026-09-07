@@ -1,8 +1,9 @@
-// app/(public)/terms/page.tsx
 import type { Metadata } from 'next';
 import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
 import { Shield, FileText, AlertTriangle, CheckCircle, Ban, Mail } from 'lucide-react';
+
+export const revalidate = 3600; // ISR: regenerate every hour
 
 export const metadata: Metadata = {
   title: 'Terms of Service | VibeStale',

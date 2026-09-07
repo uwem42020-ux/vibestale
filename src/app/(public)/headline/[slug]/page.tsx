@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import ShareMenu from '@/components/share/ShareMenu';
 import SourceBadge from '@/components/SourceBadge';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { ArrowLeft, ExternalLink, Calendar, Tag, Clock } from 'lucide-react';
 
@@ -117,10 +118,13 @@ export default async function HeadlinePage({ params }: Props) {
         rel="noopener noreferrer"
         className="block overflow-hidden rounded-xl border border-[var(--border)]"
       >
-        <img
+        <Image
           src={bannerAdImage}
           alt="Advertisement"
           className="w-full h-auto object-cover"
+          width={320}
+          height={100}
+          loading="lazy"
         />
       </a>
     </div>
@@ -134,11 +138,14 @@ export default async function HeadlinePage({ params }: Props) {
         rel="noopener noreferrer"
         className="block overflow-hidden rounded-xl border border-[var(--border)]"
       >
-        <img
+        <Image
           src={portraitAdImage}
           alt="Advertisement"
           className="w-full h-auto object-cover"
           style={{ minHeight: '400px' }} // ensures a long portrait feel
+          width={256}
+          height={600}
+          loading="lazy"
         />
       </a>
     </div>
@@ -171,10 +178,13 @@ export default async function HeadlinePage({ params }: Props) {
             {/* Article image */}
             {headline.image_url ? (
               <div className="relative">
-                <img
+                <Image
                   src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                   alt={headline.title}
                   className="w-full h-64 sm:h-80 lg:h-96 object-cover"
+                  width={1200}
+                  height={630}
+                  priority
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -266,10 +276,13 @@ export default async function HeadlinePage({ params }: Props) {
               rel="noopener noreferrer"
               className="block overflow-hidden rounded-xl border border-[var(--border)]"
             >
-              <img
+              <Image
                 src="/Advertise%20with%20vibestale.png"
                 alt="Advertisement"
                 className="w-full h-auto object-cover"
+                width={256}
+                height={600}
+                loading="lazy"
               />
             </a>
           </div>

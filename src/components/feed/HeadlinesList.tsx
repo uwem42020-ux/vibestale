@@ -1,17 +1,27 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useRef } from 'react';
 import HeadlineCard from './HeadlineCard';
 import FeaturedHeadlineCard from './FeaturedHeadlineCard';
 
 type Headline = any; // use your actual type
 
 export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: Headline[] }) {
-  const [headlines, setHeadlines] = useState<Headline[]>(initialHeadlines);
+  // Deduplicate initial headlines by ID
+  const [headlines, setHeadlines] = useState<Headline[]>(() => {
+    const seen = new Set<string>();
+    return initialHeadlines.filter((h) => {
+      if (seen.has(h.id)) return false;
+      seen.add(h.id);
+      return true;
+    });
+  });
+
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const featured = headlines[0];
   const rest = headlines.slice(1);
@@ -32,12 +42,34 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
       setNoMore(true);
     } else {
       startTransition(() => {
-        setHeadlines((prev) => [...prev, ...data.headlines]);
+        setHeadlines((prev) => {
+          const existingIds = new Set(prev.map((h) => h.id));
+          const uniqueNew = data.headlines.filter((h: any) => !existingIds.has(h.id));
+          return [...prev, ...uniqueNew];
+        });
         setPage(nextPage);
       });
     }
     setLoading(false);
   };
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const currentSentinel = sentinelRef.current;
+    if (!currentSentinel || noMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && !noMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(currentSentinel);
+    return () => observer.disconnect();
+  }, [loading, noMore, page]);
 
   return (
     <div>
@@ -53,22 +85,20 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
         ))}
       </div>
 
-      <div className="mt-8 text-center">
-        {!noMore ? (
-          <button
-            onClick={loadMore}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-8 py-3 bg-[var(--surface)] text-[var(--text-primary)] font-semibold rounded-xl border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all shadow-sm hover:shadow-lg disabled:opacity-50"
-          >
-            {loading ? 'Loading...' : 'Load More Stories'}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        ) : (
-          <p className="text-sm text-[var(--text-tertiary)]">No more stories</p>
-        )}
-      </div>
+      {/* Sentinel for infinite scroll */}
+      <div ref={sentinelRef} className="h-10" />
+
+      {loading && (
+        <div className="text-center py-4">
+          <span className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[var(--accent)] border-t-transparent" />
+        </div>
+      )}
+
+      {noMore && (
+        <p className="text-sm text-[var(--text-tertiary)] text-center mt-4">
+          No more stories
+        </p>
+      )}
     </div>
   );
 }
