@@ -234,10 +234,7 @@ export default async function CategoryPage({ params }: Props) {
         <PortraitAdBanner />
 
         <div className="flex-1 min-w-0">
-          {/* Mobile nav */}
-          <div className="md:hidden mb-4">
-            <LiveClock initialTime={serverNow} />
-          </div>
+          {/* Mobile category nav (top) */}
           <div className="md:hidden mb-4 relative">
             <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
               <span className="flex-shrink-0 px-3 py-1.5 bg-green-700 text-white text-sm font-semibold rounded-full">Headlines</span>
@@ -264,15 +261,20 @@ export default async function CategoryPage({ params }: Props) {
             {slug.charAt(0).toUpperCase() + slug.slice(1)}
           </h1>
 
-          {/* Mobile Trending News slider (global, not category-specific) */}
+          {/* Mobile Trending News slider (with date/time on same line as heading) */}
           <div className="md:hidden mb-6">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">Trending News</h2>
-            <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">Trending News</h2>
+              <div className="flex-shrink-0">
+                <LiveClock initialTime={serverNow} />
+              </div>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-3 no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {trendingWithArrows.map((item) => (
                 <Link
                   key={item.id}
                   href={`/headline/${item.slug}`}
-                  className="flex-shrink-0 w-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-3"
+                  className="flex-shrink-0 w-48 group"
                 >
                   <div className="flex items-center gap-1 mb-1">
                     {item.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
@@ -283,18 +285,20 @@ export default async function CategoryPage({ params }: Props) {
                     <Image
                       src={`/api/image?url=${encodeURIComponent(item.image_url)}`}
                       alt={item.title}
-                      className="w-full h-24 object-cover rounded-lg mb-2"
+                      className="w-full h-24 object-cover rounded-lg"
                       width={192}
                       height={96}
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg mb-2 flex items-center justify-center">
+                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg flex items-center justify-center">
                       <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                   )}
-                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2">{item.title}</span>
+                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 mt-2 block">
+                    {item.title}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -315,7 +319,6 @@ export default async function CategoryPage({ params }: Props) {
               <CategoryHeadlinesList initialItems={items} slug={slug} />
             </div>
 
-            {/* Sidebar: no sticky, multiple sections */}
             <aside className="w-80 flex-shrink-0">
               <div className="space-y-6">
                 <SmallAdvertBanner />

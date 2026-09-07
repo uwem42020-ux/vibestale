@@ -2,12 +2,11 @@
 
 import { useState, useTransition, useEffect, useRef } from 'react';
 import HeadlineCard from './HeadlineCard';
-import FeaturedHeadlineCard from './FeaturedHeadlineCard';
+import RotatingFeaturedCard from './RotatingFeaturedCard';
 
 type Headline = any; // use your actual type
 
 export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: Headline[] }) {
-  // Deduplicate initial headlines by ID
   const [headlines, setHeadlines] = useState<Headline[]>(() => {
     const seen = new Set<string>();
     return initialHeadlines.filter((h) => {
@@ -16,15 +15,14 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
       return true;
     });
   });
-
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
   const [isPending, startTransition] = useTransition();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const featured = headlines[0];
-  const rest = headlines.slice(1);
+  const featured = headlines.slice(0, 5); // top 5 for rotating
+  const rest = headlines.slice(1); // skip the first one because it's in the carousel
 
   const loadMore = async () => {
     if (loading || noMore) return;
@@ -53,7 +51,6 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
     setLoading(false);
   };
 
-  // Infinite scroll observer
   useEffect(() => {
     const currentSentinel = sentinelRef.current;
     if (!currentSentinel || noMore) return;
@@ -73,9 +70,9 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
 
   return (
     <div>
-      {featured && (
+      {featured.length > 0 && (
         <div className="mb-6">
-          <FeaturedHeadlineCard headline={featured} />
+          <RotatingFeaturedCard headlines={featured} />
         </div>
       )}
 
@@ -85,7 +82,6 @@ export default function HeadlinesList({ initialHeadlines }: { initialHeadlines: 
         ))}
       </div>
 
-      {/* Sentinel for infinite scroll */}
       <div ref={sentinelRef} className="h-10" />
 
       {loading && (

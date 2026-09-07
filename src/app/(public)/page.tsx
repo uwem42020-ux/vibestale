@@ -247,10 +247,7 @@ export default async function HomePage() {
         <PortraitAdBanner />
 
         <div className="flex-1 min-w-0">
-          {/* Mobile date + nav */}
-          <div className="md:hidden mb-4">
-            <LiveClock initialTime={serverNow} />
-          </div>
+          {/* Mobile category nav (top) */}
           <div className="md:hidden mb-6 relative">
             <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
               <span className="flex-shrink-0 px-4 py-2 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md">
@@ -272,14 +269,23 @@ export default async function HomePage() {
             <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
           </div>
 
-          {/* Mobile Trending slider */}
+          {/* Mobile Trending slider (with date/time on same line as heading) */}
           <div className="md:hidden mb-6">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
-              Trending News
-            </h2>
-            <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
+                Trending News
+              </h2>
+              <div className="flex-shrink-0">
+                <LiveClock initialTime={serverNow} />
+              </div>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-3 no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {trendingWithArrows.map((headline) => (
-                <Link key={headline.id} href={`/headline/${headline.slug}`} className="flex-shrink-0 w-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-3">
+                <Link
+                  key={headline.id}
+                  href={`/headline/${headline.slug}`}
+                  className="flex-shrink-0 w-48 group"
+                >
                   <div className="flex items-center gap-1 mb-1">
                     {headline.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
                     {headline.arrow === 'down' && <TrendingDown className="w-4 h-4 text-red-500 animate-pulse" />}
@@ -291,18 +297,20 @@ export default async function HomePage() {
                     <Image
                       src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                       alt={headline.title}
-                      className="w-full h-24 object-cover rounded-lg mb-2"
+                      className="w-full h-24 object-cover rounded-lg"
                       width={192}
                       height={96}
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg mb-2 flex items-center justify-center">
+                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg flex items-center justify-center">
                       <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                   )}
-                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2">{headline.title}</span>
+                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 mt-2 block">
+                    {headline.title}
+                  </span>
                 </Link>
               ))}
             </div>
