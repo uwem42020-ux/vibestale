@@ -1,43 +1,28 @@
 import type { Metadata } from 'next';
-import Sidebar from '@/components/Sidebar';
+import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
-import { 
-  Newspaper, 
-  Music, 
-  Video, 
-  Star, 
-  Film, 
-  Tv, 
-  Laugh, 
-  Zap, 
-  Shield, 
-  Eye, 
+import {
+  Newspaper,
+  Zap,
+  Shield,
+  Eye,
   Smartphone,
   MessageCircle,
   ChevronDown,
   Bot,
   Globe,
   Users,
-  Target
+  Target,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About VibeStale | AI-Powered Nigerian News & Media',
+  title: 'About VibeStale | AI-Powered Nigerian News',
   description:
-    'VibeStale is a Nigerian AI-powered news and media platform. We aggregate headlines from trusted sources, generate neutral AI context, and provide music, movies, live TV, celebrity news, and memes—all in one place.',
+    'VibeStale is a Nigerian AI-powered news platform. We aggregate headlines from trusted sources, generate neutral AI summaries, and deliver live news, celebrity news, and in-depth updates—all in one place.',
 };
 
 export default function AboutPage() {
   const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
-
-  const mediaFeatures = [
-    { icon: <Music className="w-5 h-5" />, title: 'Music', description: 'Listen to official audio tracks' },
-    { icon: <Video className="w-5 h-5" />, title: 'Music Videos', description: 'Watch the latest videos' },
-    { icon: <Star className="w-5 h-5" />, title: 'Celebrity News', description: 'Entertainment gossip and updates' },
-    { icon: <Film className="w-5 h-5" />, title: 'Movies', description: 'Nigerian films, action, and comedy' },
-    { icon: <Tv className="w-5 h-5" />, title: 'Live TV', description: 'Trusted live news channels' },
-    { icon: <Laugh className="w-5 h-5" />, title: 'Memes', description: 'Funny content from creators' },
-  ];
 
   const values = [
     { icon: <Shield className="w-5 h-5" />, title: 'Neutrality', description: 'AI summaries are factual and unbiased' },
@@ -48,7 +33,7 @@ export default function AboutPage() {
 
   return (
     <div className="md:flex md:gap-8">
-      <Sidebar initialTime={serverNow} />
+      <PortraitAdBanner />
 
       <div className="flex-1 min-w-0">
         <div className="md:hidden mb-4">
@@ -84,7 +69,7 @@ export default function AboutPage() {
               </h2>
             </div>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              VibeStale is a Nigerian news and media intelligence platform that combines
+              VibeStale is a Nigerian news intelligence platform that combines
               real-time headlines with artificial intelligence to give you context, clarity,
               and insight. We help you stay informed about politics, business, sports,
               entertainment, technology, and more—without noise or bias.
@@ -107,21 +92,11 @@ export default function AboutPage() {
               articles. Instead, we link directly to the original publisher so you can read
               the full story from the source.
             </p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-              {mediaFeatures.map((feature, index) => (
-                <div 
-                  key={index}
-                  className="group p-4 rounded-xl border border-[var(--border)] hover:border-[var(--accent)] transition-all hover:shadow-md"
-                >
-                  <div className="text-[var(--accent)] mb-3">{feature.icon}</div>
-                  <h3 className="font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent)] transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-[var(--text-tertiary)]">{feature.description}</p>
-                </div>
-              ))}
-            </div>
+
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              We also provide live news channels and celebrity news updates, all in one
+              modern platform.
+            </p>
           </section>
 
           {/* How It Works */}
@@ -141,9 +116,8 @@ export default function AboutPage() {
                 and why it matters to Nigerians. The original source is always linked.
               </p>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                For music and videos, we use official YouTube content and embed players
-                directly on VibeStale, so you can watch or listen without leaving the
-                platform.
+                We also curate live news channels and celebrity updates using official
+                YouTube streams, so you can stay up to date without leaving the platform.
               </p>
             </div>
           </section>
@@ -177,7 +151,7 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {values.map((value, index) => (
-                <div 
+                <div
                   key={index}
                   className="flex items-start gap-3 p-4 rounded-xl bg-[var(--surface-hover)]"
                 >
@@ -219,10 +193,10 @@ export default function AboutPage() {
                 },
                 {
                   q: 'Can I share VibeStale content?',
-                  a: 'Yes! Use the share menu on any headline or media item to share via WhatsApp, Facebook, X (Twitter), or Telegram.'
+                  a: 'Yes! Use the share menu on any headline to share via WhatsApp, Facebook, X (Twitter), or Telegram.'
                 },
               ].map((faq, index) => (
-                <div 
+                <div
                   key={index}
                   className="rounded-xl border border-[var(--border)] overflow-hidden"
                 >

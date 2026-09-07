@@ -70,26 +70,50 @@ export default async function HeadlinePage({ params }: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${baseUrl}/headline/${headline.slug}`;
 
-  const AdvertBox = () => (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 text-center shadow-sm">
-      <p className="text-sm text-[var(--text-secondary)] mb-2">Advertise with us</p>
+  // Placeholder image URLs – replace with your actual ad image URLs
+  const bannerAdImage = '/ads/banner-ad.png';       // small horizontal banner
+  const portraitAdImage = '/ads/portrait-ad.png';   // long vertical ad
+
+  // Ad components with images
+  const BannerAd = () => (
+    <div className="md:hidden mb-4">
       <a
         href="https://wa.me/2348038887589"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[var(--accent)] font-semibold text-lg hover:text-[var(--accent-hover)] transition-colors"
+        className="block overflow-hidden rounded-xl border border-[var(--border)]"
       >
-        WhatsApp: +234 803 888 7589
+        <img
+          src={bannerAdImage}
+          alt="Advertisement"
+          className="w-full h-auto object-cover"
+        />
+      </a>
+    </div>
+  );
+
+  const PortraitAd = () => (
+    <div className="md:hidden mt-6">
+      <a
+        href="https://wa.me/2348038887589"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block overflow-hidden rounded-xl border border-[var(--border)]"
+      >
+        <img
+          src={portraitAdImage}
+          alt="Advertisement"
+          className="w-full h-auto object-cover"
+          style={{ minHeight: '400px' }} // ensures a long portrait feel
+        />
       </a>
     </div>
   );
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Mobile advert before image */}
-      <div className="md:hidden mb-4">
-        <AdvertBox />
-      </div>
+      {/* Mobile banner ad before article image */}
+      <BannerAd />
 
       <div className="md:flex md:gap-6 md:items-start">
         {/* Main article */}
@@ -104,7 +128,7 @@ export default async function HeadlinePage({ params }: Props) {
           </Link>
 
           <article className="bg-[var(--surface)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden">
-            {/* Image */}
+            {/* Article image */}
             {headline.image_url ? (
               <div className="relative">
                 <img
@@ -124,12 +148,11 @@ export default async function HeadlinePage({ params }: Props) {
             )}
 
             <div className="p-6 sm:p-8">
-              {/* Title */}
+              {/* Title, meta, analysis, actions – same as before */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4 font-space-grotesk leading-tight">
                 {headline.title}
               </h1>
 
-              {/* Meta info */}
               <div className="flex items-center gap-3 mb-6 text-sm text-[var(--text-tertiary)] flex-wrap">
                 {headline.sources && (
                   <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
@@ -158,7 +181,6 @@ export default async function HeadlinePage({ params }: Props) {
                 )}
               </div>
 
-              {/* AI Analysis */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                   <span className="w-1 h-6 bg-[var(--accent)] rounded-full" />
@@ -173,7 +195,6 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-6 border-t border-[var(--border)]">
                 <a
                   href={headline.original_url}
@@ -188,12 +209,26 @@ export default async function HeadlinePage({ params }: Props) {
               </div>
             </div>
           </article>
+
+          {/* Mobile portrait ad after article */}
+          <PortraitAd />
         </div>
 
-        {/* Desktop advert sidebar */}
+        {/* Desktop sidebar ad */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="sticky top-24">
-            <AdvertBox />
+            <a
+              href="https://wa.me/2348038887589"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block overflow-hidden rounded-xl border border-[var(--border)]"
+            >
+              <img
+                src="/ads/sidebar-ad.png"
+                alt="Advertisement"
+                className="w-full h-auto object-cover"
+              />
+            </a>
           </div>
         </aside>
       </div>

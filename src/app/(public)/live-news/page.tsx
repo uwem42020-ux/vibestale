@@ -1,5 +1,5 @@
 import LiveTVCard from '@/components/livetv/LiveTVCard';
-import Sidebar from '@/components/Sidebar';
+import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
 
 export const dynamic = 'force-dynamic';
@@ -38,19 +38,20 @@ const channels = [
   },
 ];
 
-export default async function LiveTVPage() {
+export default async function LiveNewsPage() {
   const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
 
   return (
     <div className="md:flex md:gap-8">
-      <Sidebar initialTime={serverNow} />
+      {/* Portrait advert banner (desktop left) */}
+      <PortraitAdBanner />
 
       <div className="flex-1 min-w-0">
         <div className="md:hidden mb-4">
           <LiveClock initialTime={serverNow} />
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-2">🔴 Live News TV</h1>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">🔴 Live News</h1>
         <p className="text-sm text-gray-400 mb-6">Watch live news from trusted channels.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -67,7 +67,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-              AI-powered Nigerian news, music, movies, and media intelligence at your fingertips.
+              AI-powered Nigerian news intelligence at your fingertips.
             </p>
             
             {/* Social Links */}
@@ -85,7 +85,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Headlines */}
+          {/* Headlines (includes Celebrity News and Live News) */}
           <div>
             <h3 className="text-[var(--text-primary)] font-semibold mb-4 text-sm uppercase tracking-wider">
               Headlines
@@ -98,33 +98,8 @@ export default function Footer() {
                 { label: 'Sports', href: '/category/sports' },
                 { label: 'Tech', href: '/category/tech' },
                 { label: 'Entertainment', href: '/category/entertainment' },
-              ].map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
-                  >
-                    <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Media */}
-          <div>
-            <h3 className="text-[var(--text-primary)] font-semibold mb-4 text-sm uppercase tracking-wider">
-              Media
-            </h3>
-            <ul className="space-y-2.5">
-              {[
-                { label: 'Music', href: '/music' },
-                { label: 'Music Videos', href: '/music-videos' },
                 { label: 'Celebrity News', href: '/music-news' },
-                { label: 'Movies', href: '/movies' },
-                { label: 'Live TV', href: '/live-tv' },
-                { label: 'Memes', href: '/memes' },
+                { label: 'Live News', href: '/live-news' },
               ].map((item) => (
                 <li key={item.href}>
                   <Link

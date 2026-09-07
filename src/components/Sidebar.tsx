@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronDown, Newspaper, Music, TrendingUp, Clock } from 'lucide-react';
+import { ChevronDown, Newspaper, Tv, Clock } from 'lucide-react';
 
 const headlineCategories = [
   { slug: 'general', label: 'General', icon: '📰' },
@@ -14,27 +14,18 @@ const headlineCategories = [
   { slug: 'entertainment', label: 'Entertainment', icon: '🎬' },
 ];
 
-const mediaCategories = [
-  { label: 'Music', href: '/music', icon: '🎵' },
-  { label: 'Music Videos', href: '/music-videos', icon: '🎤' },
-  { label: 'Movies', href: '/movies', icon: '🎬' },
-  { label: 'Live TV', href: '/live-tv', icon: '📺' },
-  { label: 'Memes', href: '/memes', icon: '😂' },
-];
-
 export default function Sidebar({ initialTime }: { initialTime?: string | null }) {
   const pathname = usePathname();
   const [headlinesOpen, setHeadlinesOpen] = useState(true);
-  const [mediaOpen, setMediaOpen] = useState(false);
 
+  // No media section, so we can keep headlines open by default.
+  // If you later want to close it on certain routes, adjust here.
   useEffect(() => {
-    const isMediaRoute = mediaCategories.some((item) => pathname.startsWith(item.href));
-    if (isMediaRoute) {
+    // Keep headlines open unless on a headline detail page (optional)
+    if (pathname.startsWith('/headline/')) {
       setHeadlinesOpen(false);
-      setMediaOpen(true);
     } else {
       setHeadlinesOpen(true);
-      setMediaOpen(false);
     }
   }, [pathname]);
 
@@ -100,42 +91,22 @@ export default function Sidebar({ initialTime }: { initialTime?: string | null }
                   </Link>
                 );
               })}
-            </div>
-          )}
-        </div>
 
-        {/* Media Section */}
-        <div className="bg-[var(--surface)] rounded-xl overflow-hidden border border-[var(--border)]">
-          <button
-            onClick={() => setMediaOpen(!mediaOpen)}
-            className="w-full flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-hover)] transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <Music className="w-4 h-4 text-[var(--accent)]" />
-              <span className="text-sm font-semibold text-[var(--text-primary)]">Media</span>
-            </span>
-            <ChevronDown className={`w-4 h-4 transition-transform ${mediaOpen ? 'rotate-180' : ''}`} />
-          </button>
+              {/* Divider */}
+              <div className="my-2 border-t border-[var(--border)]" />
 
-          {mediaOpen && (
-            <div className="px-2 pb-2 space-y-1">
-              {mediaCategories.map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
-                      active
-                        ? 'bg-[var(--accent)] text-white font-semibold shadow-md'
-                        : 'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+              {/* Live News Link */}
+              <Link
+                href="/live-news"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                  pathname === '/live-news'
+                    ? 'bg-[var(--accent)] text-white font-semibold shadow-md'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Tv className="w-4 h-4" />
+                <span>Live News</span>
+              </Link>
             </div>
           )}
         </div>
