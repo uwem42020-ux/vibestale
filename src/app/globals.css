@@ -1,5 +1,6 @@
 /* globals.css */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --brand-orange: #FE8001;
