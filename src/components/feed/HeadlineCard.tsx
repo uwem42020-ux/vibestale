@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
 import ShareMenu from '@/components/share/ShareMenu';
-import { ExternalLink, Clock, Bookmark } from 'lucide-react';
+import { Clock, Bookmark, ArrowRight } from 'lucide-react';
 
 type Headline = {
   id: string;
@@ -42,8 +42,8 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
     <article className="group relative bg-[var(--surface)] rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-[var(--border)] hover:border-[var(--accent)]/30">
       <div className="flex gap-4 p-4">
         {/* Image */}
-        <Link 
-          href={`/headline/${headline.slug}`} 
+        <Link
+          href={`/headline/${headline.slug}`}
           className="flex-shrink-0 relative rounded-xl overflow-hidden"
         >
           {headline.image_url ? (
@@ -105,20 +105,18 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
           {/* Actions */}
           <div className="flex items-center justify-between gap-2 mt-3">
             <div className="flex items-center gap-1">
-              <a
-                href={headline.original_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={`/headline/${headline.slug}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] text-white text-xs font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
               >
-                <ExternalLink className="w-3 h-3" />
-                Read
-              </a>
+                Read Summary
+                <ArrowRight className="w-3 h-3" />
+              </Link>
               <button
                 onClick={() => setBookmarked(!bookmarked)}
                 className={`p-1.5 rounded-lg transition-colors ${
-                  bookmarked 
-                    ? 'text-[var(--accent)] bg-[var(--accent)]/10' 
+                  bookmarked
+                    ? 'text-[var(--accent)] bg-[var(--accent)]/10'
                     : 'text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)]'
                 }`}
                 aria-label="Bookmark article"
@@ -126,7 +124,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
                 <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
               </button>
             </div>
-            
+
             <ShareMenu title={headline.title} url={shareUrl} />
           </div>
         </div>

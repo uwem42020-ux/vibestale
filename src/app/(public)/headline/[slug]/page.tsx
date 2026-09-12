@@ -2,10 +2,11 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ShareMenu from '@/components/share/ShareMenu';
 import SourceBadge from '@/components/SourceBadge';
+import NewsletterSignup from '@/components/NewsletterSignup';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { ArrowLeft, ExternalLink, Calendar, Tag, Clock } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Calendar, Tag, Clock, Info, BookOpen } from 'lucide-react';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}/headline/${headline.slug}`;
 
   return {
-    title: `${headline.title} | VibeStale`,
+    title: `${headline.title} | Vibestale`,
     description: headline.ai_summary?.substring(0, 155) || '',
     alternates: {
       canonical: fullUrl,
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: headline.ai_summary || '',
       url: fullUrl,
       type: 'article',
-      siteName: 'VibeStale',
+      siteName: 'Vibestale',
       publishedTime: headline.published_at || undefined,
       modifiedTime: headline.published_at || undefined,
       images: [
@@ -88,12 +89,12 @@ export default async function HeadlinePage({ params }: Props) {
     dateModified: headline.updated_at || headline.published_at,
     author: {
       '@type': 'Organization',
-      name: headline.sources?.name || 'VibeStale',
+      name: headline.sources?.name || 'Vibestale',
       url: headline.sources?.base_url || baseUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'VibeStale',
+      name: 'Vibestale',
       logo: {
         '@type': 'ImageObject',
         url: `${baseUrl}/blacklogo.png`,
@@ -105,11 +106,11 @@ export default async function HeadlinePage({ params }: Props) {
     },
   };
 
-  // Placeholder image URLs – replace with your actual ad image URLs
-  const bannerAdImage = '/advert%20design.png';       // small horizontal banner
-  const portraitAdImage = '/Advertise%20with%20vibestale.png';   // long vertical ad
+  // Ad image paths
+  const bannerAdImage = '/advert%20design.png';
+  const portraitAdImage = '/Advertise%20with%20vibestale.png';
 
-  // Ad components with images
+  // Mobile banner ad (before article image)
   const BannerAd = () => (
     <div className="md:hidden mb-4">
       <a
@@ -130,25 +131,31 @@ export default async function HeadlinePage({ params }: Props) {
     </div>
   );
 
-  const PortraitAd = () => (
-    <div className="md:hidden mt-6">
-      <a
-        href="https://wa.me/2348038887589"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block overflow-hidden rounded-xl border border-[var(--border)]"
-      >
-        <Image
-          src={portraitAdImage}
-          alt="Advertisement"
-          className="w-full h-auto object-cover"
-          style={{ minHeight: '400px' }} // ensures a long portrait feel
-          width={256}
-          height={600}
-          loading="lazy"
-        />
-      </a>
-    </div>
+  // Mobile portrait ad + newsletter (after article)
+  const MobilePostArticle = () => (
+    <>
+      <div className="md:hidden mt-6">
+        <a
+          href="https://wa.me/2348038887589"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block overflow-hidden rounded-xl border border-[var(--border)]"
+        >
+          <Image
+            src={portraitAdImage}
+            alt="Advertisement"
+            className="w-full h-auto object-cover"
+            style={{ minHeight: '400px' }}
+            width={256}
+            height={600}
+            loading="lazy"
+          />
+        </a>
+      </div>
+      <div className="md:hidden mt-6">
+        <NewsletterSignup />
+      </div>
+    </>
   );
 
   return (
@@ -232,6 +239,39 @@ export default async function HeadlinePage({ params }: Props) {
                 )}
               </div>
 
+              {/* Source Attribution Box */}
+              <div className="bg-[var(--surface-hover)] border border-[var(--border)] rounded-xl p-4 sm:p-5 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-[var(--accent)]/10 rounded-lg flex-shrink-0">
+                    <Info className="w-4 h-4 text-[var(--accent)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2">
+                      Source
+                    </p>
+                    <p className="text-sm text-[var(--text-primary)] mb-1">
+                      <span className="text-[var(--text-secondary)]">Original reporting:</span>{' '}
+                      {headline.sources ? (
+                        <a
+                          href={headline.sources.base_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--accent)] hover:underline font-medium"
+                        >
+                          {headline.sources.name}
+                        </a>
+                      ) : (
+                        <span className="font-medium">Unknown</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
+                      This page is a Vibestale summary. All reporting credit goes to the
+                      original publisher. Read the full story via the link below.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Analysis */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
@@ -247,6 +287,30 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
+              {/* Explains cross-link */}
+              <div className="bg-[var(--accent)]/5 border border-[var(--accent)]/20 rounded-xl p-4 sm:p-5 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-[var(--accent)]/10 rounded-lg flex-shrink-0">
+                    <BookOpen className="w-4 h-4 text-[var(--accent)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[var(--text-primary)] font-semibold mb-1">
+                      Want more context?
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-2">
+                      Visit Vibestale Explains for deep dives into the stories that matter —
+                      clear guides on how things actually work in Nigeria.
+                    </p>
+                    <Link
+                      href="/explains"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)] hover:underline"
+                    >
+                      Explore Vibestale Explains →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
               {/* Actions */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-6 border-t border-[var(--border)]">
                 <a
@@ -256,20 +320,20 @@ export default async function HeadlinePage({ params }: Props) {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--accent-hover)] transition-colors shadow-lg hover:shadow-xl"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Read Full Story
+                  Read Full Story at {headline.sources?.name || 'Original Source'}
                 </a>
                 <ShareMenu title={headline.title} url={shareUrl} />
               </div>
             </div>
           </article>
 
-          {/* Mobile portrait ad after article */}
-          <PortraitAd />
+          {/* Mobile portrait ad + newsletter after article */}
+          <MobilePostArticle />
         </div>
 
-        {/* Desktop sidebar ad */}
+        {/* Desktop sidebar: ad + newsletter */}
         <aside className="hidden md:block w-64 flex-shrink-0">
-          <div className="sticky top-24">
+          <div className="sticky top-24 space-y-4">
             <a
               href="https://wa.me/2348038887589"
               target="_blank"
@@ -285,6 +349,7 @@ export default async function HeadlinePage({ params }: Props) {
                 loading="lazy"
               />
             </a>
+            <NewsletterSignup />
           </div>
         </aside>
       </div>

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SourceBadge from '@/components/SourceBadge';
 import ShareMenu from '@/components/share/ShareMenu';
-import { ExternalLink, Clock, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, TrendingUp, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 type Headline = {
   id: string;
@@ -173,15 +173,13 @@ export default function RotatingFeaturedCard({ headlines, intervalMs = 5000 }: R
           </p>
         )}
         <div className="flex items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
-          <a
-            href={current.original_url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={`/headline/${current.slug}`}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--accent)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
           >
-            <ExternalLink className="w-4 h-4" />
-            Read Full Story
-          </a>
+            Read Summary
+            <ArrowRight className="w-4 h-4" />
+          </Link>
           <ShareMenu title={current.title} url={shareUrl} />
         </div>
       </div>

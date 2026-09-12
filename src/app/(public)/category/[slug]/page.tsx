@@ -32,24 +32,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const category = headlineCategories.find((c) => c.slug === slug);
   const categoryName = category?.label || slug.charAt(0).toUpperCase() + slug.slice(1);
-  const description = `Latest ${categoryName} news from Nigeria and around the world. Stay updated with breaking stories, AI summaries, and trusted sources.`;
+  const description = `Latest ${categoryName} news from Nigeria, explained. Stay updated with breaking stories, AI-powered context, and trusted sources.`;
 
   return {
-    title: `${categoryName} News Today | VibeStale`,
+    title: `${categoryName} News Today | Vibestale`,
     description,
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_APP_URL}/category/${slug}`,
     },
     openGraph: {
-      title: `${categoryName} News Today | VibeStale`,
+      title: `${categoryName} News Today | Vibestale`,
       description,
       type: 'website',
       url: `${process.env.NEXT_PUBLIC_APP_URL}/category/${slug}`,
-      siteName: 'VibeStale',
+      siteName: 'Vibestale',
     },
     twitter: {
       card: 'summary',
-      title: `${categoryName} News Today | VibeStale`,
+      title: `${categoryName} News Today | Vibestale`,
       description,
     },
   };

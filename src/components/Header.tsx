@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
-import { Sun, Moon, X, LayoutGrid } from 'lucide-react';
+import { Sun, Moon, X, LayoutGrid, BookOpen } from 'lucide-react';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,9 @@ export default function Header() {
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [menuOpen]);
 
   const navLinks = [
@@ -49,7 +51,7 @@ export default function Header() {
           <Link href="/" className="flex-shrink-0 group z-10">
             <Image
               src={theme === 'dark' ? '/whitelogo.png' : '/blacklogo.png'}
-              alt="VibeStale"
+              alt="Vibestale"
               className="h-10 w-auto transition-transform group-hover:scale-105"
               width={120}
               height={40}
@@ -59,6 +61,19 @@ export default function Header() {
 
           {/* Right actions */}
           <div className="flex items-center gap-2 z-10">
+            {/* Explains — visible on desktop only, small pill */}
+            <Link
+              href="/explains"
+              className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
+                pathname === '/explains'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Explains
+            </Link>
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-[var(--surface-hover)] transition-colors"
@@ -115,13 +130,27 @@ export default function Header() {
                   className={`text-lg font-medium transition-colors ${
                     pathname === link.href
                       ? 'text-[var(--accent)]'
-                      : 'text-[var(--accent)]'
+                      : 'text-[var(--text-primary)] hover:text-[var(--accent)]'
                   }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
+
+              {/* Explains — highlighted in mobile menu */}
+              <Link
+                href="/explains"
+                className={`inline-flex items-center gap-2 text-lg font-medium transition-colors ${
+                  pathname === '/explains'
+                    ? 'text-[var(--accent)]'
+                    : 'text-[var(--accent)]'
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                <BookOpen className="w-5 h-5" />
+                Vibestale Explains
+              </Link>
             </nav>
           </div>
         </div>

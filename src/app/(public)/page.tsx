@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import HeadlinesList from '@/components/feed/HeadlinesList';
 import PortraitAdBanner from '@/components/PortraitAdBanner';
 import LiveClock from '@/components/LiveClock';
+import NewsletterSignup from '@/components/NewsletterSignup';
 import Link from 'next/link';
 import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
@@ -31,25 +32,25 @@ const navCategories: NavItem[] = [
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vibestale.com';
   return {
-    title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+    title: 'Vibestale | Nigerian News, Explained',
     description:
-      'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+      'Understand what is happening in Nigeria — not just what happened. Breaking news, politics, business, sports, tech, and entertainment with AI-powered context and summaries.',
     alternates: {
       canonical: baseUrl,
     },
     openGraph: {
-      title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+      title: 'Vibestale | Nigerian News, Explained',
       description:
-        'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+        'Understand what is happening in Nigeria — not just what happened. Breaking news, politics, business, sports, tech, and entertainment with AI-powered context and summaries.',
       type: 'website',
       url: baseUrl,
-      siteName: 'VibeStale',
+      siteName: 'Vibestale',
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'VibeStale | Nigerian News, Breaking Headlines, Politics, Sports, Tech',
+      title: 'Vibestale | Nigerian News, Explained',
       description:
-        'Get the latest Nigerian news and breaking headlines on politics, business, sports, tech, entertainment, and more. Stay informed with AI-powered summaries from trusted sources.',
+        'Understand what is happening in Nigeria — not just what happened. Breaking news, politics, business, sports, tech, and entertainment with AI-powered context and summaries.',
     },
   };
 }
@@ -210,7 +211,7 @@ export default async function HomePage() {
   const organizationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'VibeStale',
+    name: 'Vibestale',
     url: baseUrl,
     logo: `${baseUrl}/blacklogo.png`,
     sameAs: [
@@ -223,7 +224,7 @@ export default async function HomePage() {
   const webSiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'VibeStale',
+    name: 'Vibestale',
     url: baseUrl,
     potentialAction: {
       '@type': 'SearchAction',
@@ -242,6 +243,17 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
       />
+
+      {/* Hero positioning — desktop only */}
+      <div className="hidden md:block mb-8">
+        <h1 className="text-3xl lg:text-4xl font-bold text-[var(--text-primary)] font-space-grotesk leading-tight">
+          Nigerian News, <span className="text-[var(--accent)]">Explained.</span>
+        </h1>
+        <p className="text-base text-[var(--text-secondary)] mt-2 max-w-2xl">
+          Understand what&apos;s happening — not just what happened. AI-powered summaries,
+          context, and trusted sources.
+        </p>
+      </div>
 
       <div className="md:flex md:gap-8">
         <PortraitAdBanner />
@@ -323,7 +335,7 @@ export default async function HomePage() {
           <div className="hidden md:flex md:gap-8">
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h1>
+                <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-space-grotesk">Latest Headlines</h2>
                 <span className="text-sm text-[var(--text-tertiary)]">{headlines.length} stories</span>
               </div>
               <HeadlinesList initialHeadlines={headlines} />
@@ -332,6 +344,8 @@ export default async function HomePage() {
             <aside className="w-80 flex-shrink-0">
               <div className="space-y-6">
                 <SmallAdvertBanner />
+
+                <NewsletterSignup />
 
                 <section>
                   <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">

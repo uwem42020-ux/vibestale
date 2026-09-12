@@ -58,12 +58,12 @@ export default function Footer() {
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-12">
-          {/* Brand Section - full width on mobile, 1 col on desktop */}
+          {/* Brand Section */}
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block mb-4">
               <Image
                 src={theme === 'dark' ? '/whitelogo.png' : '/blacklogo.png'}
-                alt="VibeStale"
+                alt="Vibestale"
                 className="h-10 w-auto"
                 width={120}
                 height={40}
@@ -71,7 +71,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-              AI-powered Nigerian news intelligence at your fingertips.
+              Nigerian news, explained. AI-powered summaries, context, and trusted sources.
             </p>
 
             {/* Social Links */}
@@ -120,43 +120,27 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Learn */}
           <div className="col-span-1">
             <h3 className="text-[var(--text-primary)] font-semibold mb-4 text-sm uppercase tracking-wider">
-              Company
+              Learn
             </h3>
             <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
-                >
-                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/2348038887589"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
-                >
-                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
-                  Advertise
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/2348038887589"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
-                >
-                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
-                  Contact
-                </a>
-              </li>
+              {[
+                { label: 'Vibestale Explains', href: '/explains' },
+                { label: 'About Us', href: '/about' },
+                { label: 'Editorial Policy', href: '/editorial-policy' },
+              ].map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
+                  >
+                    <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
 
             {/* Contact Info */}
@@ -184,7 +168,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Legal - full width on mobile, 1 col on desktop */}
+          {/* Legal */}
           <div className="col-span-2 lg:col-span-1">
             <h3 className="text-[var(--text-primary)] font-semibold mb-4 text-sm uppercase tracking-wider">
               Legal
@@ -208,6 +192,35 @@ export default function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/corrections-policy"
+                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
+                >
+                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
+                  Corrections Policy
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://wa.me/2348038887589"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
+                >
+                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
+                  Advertise
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:info@vibestale.com"
+                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors inline-flex items-center group"
+                >
+                  <span className="w-0 group-hover:w-2 h-px bg-[var(--accent)] transition-all duration-300 mr-0 group-hover:mr-2" />
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -218,16 +231,24 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-[var(--text-tertiary)]">
-              © {year} VibeStale — AI-powered Nigerian news intelligence. All rights reserved.
+              © {year} Vibestale — Nigerian news, explained. All rights reserved.
             </p>
 
             <div className="flex items-center gap-4 text-sm text-[var(--text-tertiary)]">
               <Link href="/privacy" className="hover:text-[var(--accent)] transition-colors">
-                Privacy Policy
+                Privacy
               </Link>
               <span className="text-[var(--border)]">|</span>
               <Link href="/terms" className="hover:text-[var(--accent)] transition-colors">
-                Terms of Service
+                Terms
+              </Link>
+              <span className="text-[var(--border)]">|</span>
+              <Link href="/editorial-policy" className="hover:text-[var(--accent)] transition-colors">
+                Editorial
+              </Link>
+              <span className="text-[var(--border)]">|</span>
+              <Link href="/corrections-policy" className="hover:text-[var(--accent)] transition-colors">
+                Corrections
               </Link>
             </div>
           </div>

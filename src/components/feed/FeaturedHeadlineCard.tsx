@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
 import ShareMenu from '@/components/share/ShareMenu';
-import { ExternalLink, Clock, TrendingUp } from 'lucide-react';
+import { Clock, TrendingUp, ArrowRight } from 'lucide-react';
 
 type Headline = {
   id: string;
@@ -110,16 +110,14 @@ export default function FeaturedHeadlineCard({ headline }: { headline: Headline 
 
         {/* Actions */}
         <div className="flex items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
-          <a
-            href={headline.original_url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={`/headline/${headline.slug}`}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--accent)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
           >
-            <ExternalLink className="w-4 h-4" />
-            Read Full Story
-          </a>
-          
+            Read Summary
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+
           <ShareMenu title={headline.title} url={shareUrl} />
         </div>
       </div>
