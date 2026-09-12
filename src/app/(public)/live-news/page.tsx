@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
         'Watch live news from trusted Nigerian and international channels including Channels TV, Arise News, CNN Africa, and more. Stream online free.',
       type: 'website',
       url: `${baseUrl}/live-news`,
-      siteName: 'VibeStale',
+      siteName: 'Vibestale',
     },
     twitter: {
       card: 'summary',

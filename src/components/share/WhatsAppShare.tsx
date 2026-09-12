@@ -6,7 +6,7 @@ interface WhatsAppShareProps {
 }
 
 export default function WhatsAppShare({ title, url }: WhatsAppShareProps) {
-  const shareText = encodeURIComponent(`${title} — Read more on VibeStale: ${url}`);
+  const shareText = encodeURIComponent(`${title} — Read more on Vibestale: ${url}`);
   const whatsappUrl = `https://wa.me/?text=${shareText}`;
 
   return (

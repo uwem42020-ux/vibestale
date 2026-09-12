@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
         'Get the latest Nigerian celebrity news, entertainment gossip, and Nollywood updates. Stay informed with AI-powered summaries from trusted entertainment sources.',
       type: 'website',
       url: `${baseUrl}/music-news`,
-      siteName: 'VibeStale',
+      siteName: 'Vibestale',
     },
     twitter: {
       card: 'summary',

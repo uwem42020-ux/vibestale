@@ -6,8 +6,8 @@ import { Shield, Lock, Eye, Database, Mail, FileText } from 'lucide-react';
 export const revalidate = 3600; // ISR: regenerate every hour
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | VibeStale',
-  description: 'Learn how VibeStale collects, uses, and protects your personal information.',
+  title: 'Privacy Policy | Vibestale',
+  description: 'Learn how Vibestale collects, uses, and protects your personal information.',
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_APP_URL}/privacy`,
   },
@@ -77,7 +77,7 @@ export default function PrivacyPage() {
                 Introduction
               </h2>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                VibeStale ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.
+                Vibestale ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.
               </p>
             </section>
 

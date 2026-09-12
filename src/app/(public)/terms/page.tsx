@@ -6,8 +6,8 @@ import { Shield, FileText, AlertTriangle, CheckCircle, Ban, Mail } from 'lucide-
 export const revalidate = 3600; // ISR: regenerate every hour
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | VibeStale',
-  description: 'Read the terms and conditions for using VibeStale services.',
+  title: 'Terms of Service | Vibestale',
+  description: 'Read the terms and conditions for using Vibestale services.',
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_APP_URL}/terms`,
   },
@@ -77,7 +77,7 @@ export default function TermsPage() {
                 Agreement to Terms
               </h2>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                By accessing or using VibeStale, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.
+                By accessing or using Vibestale, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.
               </p>
             </section>
 
@@ -88,7 +88,7 @@ export default function TermsPage() {
                 Acceptable Use
               </h2>
               <p className="text-[var(--text-secondary)] leading-relaxed mb-4">
-                You agree to use VibeStale only for lawful purposes and in accordance with these Terms. You agree not to:
+                You agree to use Vibestale only for lawful purposes and in accordance with these Terms. You agree not to:
               </p>
               <ul className="space-y-3">
                 {[
@@ -115,7 +115,7 @@ export default function TermsPage() {
                 Intellectual Property
               </h2>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                The VibeStale name, logo, and all related names, logos, product and service names, designs, and slogans are trademarks of VibeStale or its affiliates. You must not use such marks without prior written permission.
+                The Vibestale name, logo, and all related names, logos, product and service names, designs, and slogans are trademarks of Vibestale or its affiliates. You must not use such marks without prior written permission.
               </p>
               <p className="text-[var(--text-secondary)] leading-relaxed mt-4">
                 News content and articles remain the property of their respective publishers. We provide links to original sources and do not claim ownership over third-party content.
@@ -130,7 +130,7 @@ export default function TermsPage() {
               </h2>
               <div className="bg-[var(--accent)]/5 border border-[var(--accent)]/20 rounded-lg p-4">
                 <p className="text-[var(--text-secondary)] leading-relaxed">
-                  VibeStale is provided on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the accuracy, reliability, or availability of the service. While we strive to provide accurate information, we cannot guarantee that all content is error-free or current.
+                  Vibestale is provided on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the accuracy, reliability, or availability of the service. While we strive to provide accurate information, we cannot guarantee that all content is error-free or current.
                 </p>
               </div>
             </section>
@@ -142,7 +142,7 @@ export default function TermsPage() {
                 Limitation of Liability
               </h2>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                In no event shall VibeStale, its directors, employees, partners, agents, suppliers, or affiliates be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service.
+                In no event shall Vibestale, its directors, employees, partners, agents, suppliers, or affiliates be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service.
               </p>
             </section>
 

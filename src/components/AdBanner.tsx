@@ -5,7 +5,7 @@ export function PortraitAd() {
     <div className="overflow-hidden rounded-xl border border-[var(--border)]">
       <Image
         src="/Advertise with vibestale.png"
-        alt="Advertise with VibeStale"
+        alt="Advertise with Vibestale"
         width={256}
         height={600}
         className="w-full h-[600px] object-cover"

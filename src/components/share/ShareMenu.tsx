@@ -33,7 +33,7 @@ export default function ShareMenu({ title, url }: ShareMenuProps) {
     setOpen((prev) => !prev);
   };
 
-  const shareText = `${title}\n\nRead more on VibeStale: ${url}\n\n#VibeStale #NigeriaNews`;
+  const shareText = `${title}\n\nRead more on Vibestale: ${url}\n\n#Vibestale #NigeriaNews`;
 
   const links = [
     {

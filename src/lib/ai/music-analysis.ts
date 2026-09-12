@@ -58,7 +58,7 @@ async function generateWithOpenAI(title: string): Promise<MusicAnalysis> {
       {
         role: 'system',
         content:
-          'You are a Nigerian music critic for VibeStale. Write a short, neutral 2-3 sentence review of this new release. Determine the genre (afrobeats, amapiano, hip-hop, highlife, etc.) and confidence. Respond only in valid JSON with keys: review, genre, confidence_score.',
+          'You are a Nigerian music critic for Vibestale. Write a short, neutral 2-3 sentence review of this new release. Determine the genre (afrobeats, amapiano, hip-hop, highlife, etc.) and confidence. Respond only in valid JSON with keys: review, genre, confidence_score.',
       },
       {
         role: 'user',
@@ -89,7 +89,7 @@ async function generateWithOpenRouter(
       {
         role: 'system',
         content:
-          'You are a Nigerian music critic for VibeStale. Provide a concise, neutral review. Respond with ONLY a JSON object in this exact format: {"review": "...", "genre": "...", "confidence_score": 0.8}',
+          'You are a Nigerian music critic for Vibestale. Provide a concise, neutral review. Respond with ONLY a JSON object in this exact format: {"review": "...", "genre": "...", "confidence_score": 0.8}',
       },
       {
         role: 'user',

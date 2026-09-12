@@ -42,7 +42,7 @@ export async function GET(req: Request) {
             ai_confidence_score: analysis.confidenceScore,
             ai_analysis_status: 'completed',
             ai_model_used: 'openai',
-            meta_title: `${headline.title.substring(0, 55)} | VibeStale`,
+            meta_title: `${headline.title.substring(0, 55)} | Vibestale`,
             meta_description: analysis.summary.substring(0, 155),
             image_url: imageUrl,
             category: analysis.category,

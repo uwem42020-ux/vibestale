@@ -60,7 +60,7 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
       {
         role: 'system',
         content:
-          'You are a senior Nigerian news analyst for VibeStale. Write a 3-paragraph analysis (each paragraph 2-3 sentences) separated by newline characters.\n' +
+          'You are a senior Nigerian news analyst for Vibestale. Write a 3-paragraph analysis (each paragraph 2-3 sentences) separated by newline characters.\n' +
           '- Paragraph 1: Context/background\n' +
           '- Paragraph 2: Key players/entities involved\n' +
           '- Paragraph 3: Impact/why it matters to Nigerians\n\n' +
@@ -99,7 +99,7 @@ async function generateWithOpenRouter(
       {
         role: 'system',
         content:
-          'You are a Nigerian news analyst for VibeStale. Write a 3-paragraph analysis (each paragraph 2-3 sentences) separated by newlines. ' +
+          'You are a Nigerian news analyst for Vibestale. Write a 3-paragraph analysis (each paragraph 2-3 sentences) separated by newlines. ' +
           'Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics"}',
       },
       {
