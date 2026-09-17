@@ -63,7 +63,6 @@ export default async function HomePage() {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
 
-  // 1. Main feed: latest 10 headlines
   const { data: headlines, error } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -83,7 +82,6 @@ export default async function HomePage() {
     return <div className="text-gray-400">No headlines yet.</div>;
   }
 
-  // 2. Trending: by engagement, last 72h
   const { data: trendingHeadlines } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -95,7 +93,6 @@ export default async function HomePage() {
     .order('share_count', { ascending: false, nullsFirst: false })
     .limit(5);
 
-  // 3. Breaking News: is_breaking = true, top 2
   const { data: breakingNews } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -106,7 +103,6 @@ export default async function HomePage() {
     .order('published_at', { ascending: false })
     .limit(2);
 
-  // 4. Sports Update: category = sports, top 2
   const { data: sportsNews } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -117,7 +113,6 @@ export default async function HomePage() {
     .order('published_at', { ascending: false })
     .limit(2);
 
-  // 5. Naija Latest: category = general, top 2
   const { data: naijaLatest } = await supabase
     .from('headlines')
     .select('*, sources(name, base_url)')
@@ -128,7 +123,6 @@ export default async function HomePage() {
     .order('published_at', { ascending: false })
     .limit(2);
 
-  // Fallback trending items
   const trendingItems =
     trendingHeadlines && trendingHeadlines.length > 0
       ? trendingHeadlines
@@ -157,7 +151,6 @@ export default async function HomePage() {
     return { ...item, arrow };
   });
 
-  // Compact row for sidebar sections
   const CompactItem = ({ item, showArrow = false }: { item: any; showArrow?: boolean }) => (
     <Link
       href={`/headline/${item.slug}`}
@@ -193,9 +186,13 @@ export default async function HomePage() {
     </Link>
   );
 
-  // Small advert banner
   const SmallAdvertBanner = () => (
-    <div className="w-full rounded-xl overflow-hidden border border-[var(--border)]">
+    <a
+      href="https://nimart.ng"
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+      className="block w-full rounded-xl overflow-hidden border border-[var(--border)]"
+    >
       <Image
         src="/advert%20design.png"
         alt="Advertisement"
@@ -204,10 +201,9 @@ export default async function HomePage() {
         height={100}
         loading="lazy"
       />
-    </div>
+    </a>
   );
 
-  // Structured data
   const organizationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -281,7 +277,7 @@ export default async function HomePage() {
             <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
           </div>
 
-          {/* Mobile Trending slider (with date/time on same line as heading) */}
+          {/* Mobile Trending slider */}
           <div className="md:hidden mb-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
@@ -296,9 +292,9 @@ export default async function HomePage() {
                 <Link
                   key={headline.id}
                   href={`/headline/${headline.slug}`}
-                  className="flex-shrink-0 w-48 group"
+                  className="flex-shrink-0 w-48 group bg-[var(--surface)] rounded-xl p-2.5 shadow-sm border border-[var(--border)]"
                 >
-                  <div className="flex items-center gap-1 mb-1">
+                  <div className="flex items-center gap-1 mb-1.5 px-0.5">
                     {headline.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
                     {headline.arrow === 'down' && <TrendingDown className="w-4 h-4 text-red-500 animate-pulse" />}
                     {headline.sources && (
@@ -320,7 +316,7 @@ export default async function HomePage() {
                       <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                   )}
-                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 mt-2 block">
+                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 mt-2 block px-0.5">
                     {headline.title}
                   </span>
                 </Link>
@@ -331,7 +327,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Desktop: Main content + Sidebar with multiple sections */}
+          {/* Desktop: Main content + Sidebar */}
           <div className="hidden md:flex md:gap-8">
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-4">

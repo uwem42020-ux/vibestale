@@ -18,6 +18,7 @@ export interface AIAnalysis {
   keyEntities: string[];
   confidenceScore: number;
   category: string;
+  urgency: number;
 }
 
 export async function generateCommentary(title: string): Promise<AIAnalysis> {
@@ -64,8 +65,14 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
           '- Paragraph 1: Context/background\n' +
           '- Paragraph 2: Key players/entities involved\n' +
           '- Paragraph 3: Impact/why it matters to Nigerians\n\n' +
-          'Return ONLY valid JSON with keys: summary, sentiment, key_entities, confidence_score, category.\n' +
+          'Also rate the URGENCY of this story on a scale of 0-10:\n' +
+          '- 0-3: Routine news, low impact\n' +
+          '- 4-6: Notable but not breaking news\n' +
+          '- 7-8: Breaking news (major policy changes, big political events, significant deaths, large economic shifts)\n' +
+          '- 9-10: Critical breaking news (national emergency, coup, major disaster, president dies, war)\n\n' +
+          'Return ONLY valid JSON with keys: summary, sentiment, key_entities, confidence_score, category, urgency.\n' +
           'The "summary" field should contain the 3 paragraphs separated by \\n\\n.\n' +
+          'The "urgency" field should be an integer between 0 and 10.\n' +
           'Keep the tone neutral and factual.',
       },
       {
@@ -86,6 +93,7 @@ async function generateWithOpenAI(title: string): Promise<AIAnalysis> {
     keyEntities: parsed.key_entities || [],
     confidenceScore: parsed.confidence_score || 0.8,
     category: parsed.category || 'general',
+    urgency: typeof parsed.urgency === 'number' ? parsed.urgency : 0,
   };
 }
 
@@ -100,7 +108,8 @@ async function generateWithOpenRouter(
         role: 'system',
         content:
           'You are a Nigerian news analyst for Vibestale. Write a 3-paragraph analysis (each paragraph 2-3 sentences) separated by newlines. ' +
-          'Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics"}',
+          'Also rate the URGENCY of this story from 0-10 (0=routine, 5=notable, 8=breaking, 10=critical emergency). ' +
+          'Respond with ONLY a JSON object in this exact format: {"summary": "...", "sentiment": "...", "key_entities": [...], "confidence_score": 0.8, "category": "politics", "urgency": 5}',
       },
       {
         role: 'user',
@@ -135,6 +144,7 @@ async function generateWithOpenRouter(
     keyEntities: parsed.key_entities || [],
     confidenceScore: parsed.confidence_score || 0.5,
     category: parsed.category || 'general',
+    urgency: typeof parsed.urgency === 'number' ? parsed.urgency : 0,
   };
 }
 
@@ -145,5 +155,6 @@ function createGenericAnalysis(title: string): AIAnalysis {
     keyEntities: [],
     confidenceScore: 0.3,
     category: 'general',
+    urgency: 0,
   };
 }

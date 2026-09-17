@@ -10,12 +10,17 @@ export const metadata: Metadata = {
   title: "Vibestale — Nigerian News, Explained",
   description:
     "Understand what is happening in Nigeria — not just what happened. AI-powered summaries, context, and trusted sources across politics, business, sports, tech, and entertainment.",
+  applicationName: "Vibestale",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://vibestale.com"),
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://vibestale.com"),
+  manifest: "/site.webmanifest",
   openGraph: {
     siteName: "Vibestale",
     title: "Vibestale — Nigerian News, Explained",
@@ -50,10 +55,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <link rel="preconnect" href="https://i.ytimg.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* Favicon / Site Icon */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* Theme script */}
         <script
