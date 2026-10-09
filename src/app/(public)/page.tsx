@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 import { createClient } from '@/lib/supabase/server';
 import HeadlinesList from '@/components/feed/HeadlinesList';
 import PortraitAdBanner from '@/components/PortraitAdBanner';
@@ -6,7 +9,7 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 import Link from 'next/link';
 import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, BookOpen, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +31,42 @@ const navCategories: NavItem[] = [
   ...headlineCategories,
   { label: 'Live News', href: '/live-news' },
 ];
+
+const EXPLAINS_DIR = path.join(process.cwd(), 'src', 'content', 'explains');
+
+type ExplainerPreview = {
+  title: string;
+  slug: string;
+  category: string;
+  excerpt: string;
+  published_at: string;
+  reading_time: string;
+};
+
+function getLatestExplainers(limit: number = 3): ExplainerPreview[] {
+  if (!fs.existsSync(EXPLAINS_DIR)) return [];
+
+  const files = fs.readdirSync(EXPLAINS_DIR).filter((f) => f.endsWith('.mdx'));
+
+  const explainers = files.map((file) => {
+    const filePath = path.join(EXPLAINS_DIR, file);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const { data } = matter(fileContent);
+
+    return {
+      title: data.title as string,
+      slug: data.slug as string,
+      category: data.category as string,
+      excerpt: data.excerpt as string,
+      published_at: data.published_at as string,
+      reading_time: data.reading_time as string,
+    };
+  });
+
+  return explainers
+    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+    .slice(0, limit);
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vibestale.com';
@@ -59,6 +98,8 @@ export default async function HomePage() {
   const supabase = await createClient();
   const serverNow = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vibestale.com';
+
+  const latestExplainers = getLatestExplainers(3);
 
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
@@ -327,6 +368,41 @@ export default async function HomePage() {
             </div>
           </div>
 
+          {/* Mobile Vibestale Explains preview */}
+          {latestExplainers.length > 0 && (
+            <div className="md:hidden mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk inline-flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[var(--accent)]" />
+                  Vibestale Explains
+                </h2>
+                <Link
+                  href="/explains"
+                  className="text-xs font-semibold text-[var(--accent)] inline-flex items-center gap-1"
+                >
+                  See all
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="space-y-2.5">
+                {latestExplainers.slice(0, 2).map((explainer) => (
+                  <Link
+                    key={explainer.slug}
+                    href={`/explains/${explainer.slug}`}
+                    className="block bg-[var(--surface)] rounded-xl border border-[var(--border)] p-4 hover:border-[var(--accent)]/40 transition-colors group"
+                  >
+                    <span className="px-2 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-medium rounded-full">
+                      {explainer.category}
+                    </span>
+                    <h3 className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--accent)] transition-colors mt-2">
+                      {explainer.title}
+                    </h3>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Desktop: Main content + Sidebar */}
           <div className="hidden md:flex md:gap-8">
             <div className="flex-1 min-w-0">
@@ -342,6 +418,38 @@ export default async function HomePage() {
                 <SmallAdvertBanner />
 
                 <NewsletterSignup />
+
+                {/* Desktop Vibestale Explains preview */}
+                {latestExplainers.length > 0 && (
+                  <section>
+                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk inline-flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-[var(--accent)]" />
+                      Vibestale Explains
+                    </h2>
+                    <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                      {latestExplainers.slice(0, 2).map((explainer) => (
+                        <Link
+                          key={explainer.slug}
+                          href={`/explains/${explainer.slug}`}
+                          className="block p-3 hover:bg-[var(--surface-hover)] transition-colors border-b border-[var(--border)] group"
+                        >
+                          <span className="px-2 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-medium rounded-full">
+                            {explainer.category}
+                          </span>
+                          <h3 className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--accent)] transition-colors mt-2">
+                            {explainer.title}
+                          </h3>
+                        </Link>
+                      ))}
+                      <Link
+                        href="/explains"
+                        className="block p-3 text-xs font-semibold text-[var(--accent)] hover:bg-[var(--surface-hover)] transition-colors text-center"
+                      >
+                        Browse all explainers →
+                      </Link>
+                    </div>
+                  </section>
+                )}
 
                 <section>
                   <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
