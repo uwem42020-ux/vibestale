@@ -110,13 +110,13 @@ export default async function HeadlinePage({ params }: Props) {
   const bannerAdImage = '/advert%20design.png';
   const portraitAdImage = '/Advertise%20with%20vibestale.png';
 
-  // Mobile banner ad (before article image)
+  // Mobile banner ad (before article image) — sponsored by Nimart
   const BannerAd = () => (
     <div className="md:hidden mb-4">
       <a
-        href="https://wa.me/2348038887589"
+        href="https://nimart.ng"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="sponsored noopener noreferrer"
         className="block overflow-hidden rounded-xl border border-[var(--border)]"
       >
         <Image
@@ -160,19 +160,15 @@ export default async function HeadlinePage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Inject JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Mobile banner ad before article image */}
       <BannerAd />
 
       <div className="md:flex md:gap-6 md:items-start">
-        {/* Main article */}
         <div className="flex-1 min-w-0">
-          {/* Back button */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] mb-4 transition-colors group"
@@ -182,7 +178,6 @@ export default async function HeadlinePage({ params }: Props) {
           </Link>
 
           <article className="bg-[var(--surface)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden">
-            {/* Article image */}
             {headline.image_url ? (
               <div className="relative">
                 <Image
@@ -205,12 +200,10 @@ export default async function HeadlinePage({ params }: Props) {
             )}
 
             <div className="p-6 sm:p-8">
-              {/* Title */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)] mb-4 font-space-grotesk leading-tight">
                 {headline.title}
               </h1>
 
-              {/* Meta */}
               <div className="flex items-center gap-3 mb-6 text-sm text-[var(--text-tertiary)] flex-wrap">
                 {headline.sources && (
                   <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
@@ -239,7 +232,6 @@ export default async function HeadlinePage({ params }: Props) {
                 )}
               </div>
 
-              {/* Source Attribution Box */}
               <div className="bg-[var(--surface-hover)] border border-[var(--border)] rounded-xl p-4 sm:p-5 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-[var(--accent)]/10 rounded-lg flex-shrink-0">
@@ -272,7 +264,6 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Analysis */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                   <span className="w-1 h-6 bg-[var(--accent)] rounded-full" />
@@ -287,7 +278,6 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Explains cross-link */}
               <div className="bg-[var(--accent)]/5 border border-[var(--accent)]/20 rounded-xl p-4 sm:p-5 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-[var(--accent)]/10 rounded-lg flex-shrink-0">
@@ -311,7 +301,6 @@ export default async function HeadlinePage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-6 border-t border-[var(--border)]">
                 <a
                   href={headline.original_url}
@@ -327,11 +316,9 @@ export default async function HeadlinePage({ params }: Props) {
             </div>
           </article>
 
-          {/* Mobile portrait ad + newsletter after article */}
           <MobilePostArticle />
         </div>
 
-        {/* Desktop sidebar: ad + newsletter */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="sticky top-24 space-y-4">
             <a

@@ -107,9 +107,9 @@ export default async function ExplainerPage({ params }: Props) {
 
       <div className="md:hidden mb-4">
         <a
-          href="https://wa.me/2348038887589"
+          href="https://nimart.ng"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="sponsored noopener noreferrer"
           className="block overflow-hidden rounded-xl border border-[var(--border)]"
         >
           <Image

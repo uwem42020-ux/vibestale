@@ -191,7 +191,12 @@ export default async function CategoryPage({ params }: Props) {
 
   // Small advert banner
   const SmallAdvertBanner = () => (
-    <div className="w-full rounded-xl overflow-hidden border border-[var(--border)]">
+    <a
+      href="https://nimart.ng"
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+      className="block w-full rounded-xl overflow-hidden border border-[var(--border)]"
+    >
       <Image
         src="/advert%20design.png"
         alt="Advertisement"
@@ -200,7 +205,7 @@ export default async function CategoryPage({ params }: Props) {
         height={100}
         loading="lazy"
       />
-    </div>
+    </a>
   );
 
   // Breadcrumb structured data
