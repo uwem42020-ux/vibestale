@@ -1,47 +1,25 @@
-name: Frequent News and Music Fetch
+﻿name: Frequent News Fetch
 
 on:
   schedule:
-    - cron: '*/10 * * * *'   # every 10 minutes
-  workflow_dispatch:         # allows manual trigger
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
-  news-ingest:
+  cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Call news ingest endpoint
+      - name: News ingest
         run: |
-          curl -X GET https://vibestale3.vercel.app/api/cron/ingest \
+          curl -fsSL -X GET "https://vibestale.com/api/cron/ingest" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
 
-  news-ai-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call news AI analysis endpoint
+      - name: News AI analysis
         run: |
-          curl -X GET https://vibestale3.vercel.app/api/cron/ai-analysis \
+          curl -fsSL -X GET "https://vibestale.com/api/cron/ai-analysis" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
 
-  music-ingest:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call music ingest endpoint
+      - name: Entertainment ingest
         run: |
-          curl -X GET https://vibestale3.vercel.app/api/cron/music-ingest \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
-
-  music-ai-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call music AI analysis endpoint
-        run: |
-          curl -X GET https://vibestale3.vercel.app/api/cron/music-analysis \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
-
-  youtube-search:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call YouTube search endpoint
-        run: |
-          curl -X GET https://vibestale3.vercel.app/api/cron/youtube-search \
+          curl -fsSL -X GET "https://vibestale.com/api/cron/entertainment-ingest" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
