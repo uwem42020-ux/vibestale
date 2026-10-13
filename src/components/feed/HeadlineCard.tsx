@@ -39,9 +39,9 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
   const [bookmarked, setBookmarked] = useState(false);
 
   return (
-    <article className="group relative bg-[var(--surface)] rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-[var(--border)] hover:border-[var(--accent)]/30">
-      <div className="flex gap-4 p-4">
-        {/* Image */}
+    <article className="group relative bg-[var(--surface)] rounded-2xl shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-150 border border-[var(--border)] hover:border-[var(--accent)]/30 overflow-hidden">
+      <div className="flex gap-3 p-3">
+        {/* Image — bigger on both mobile and desktop */}
         <Link
           href={`/headline/${headline.slug}`}
           className="flex-shrink-0 relative rounded-xl overflow-hidden"
@@ -51,20 +51,20 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
               <Image
                 src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                 alt={headline.title}
-                className="w-24 h-24 sm:w-32 sm:h-32 object-cover"
-                width={128}
-                height={128}
+                className="w-32 h-32 sm:w-40 sm:h-40 object-cover"
+                width={160}
+                height={160}
                 loading="lazy"
                 referrerPolicy="no-referrer"
               />
               {headline.category && (
-                <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full capitalize">
+                <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium rounded-full capitalize">
                   {headline.category}
                 </span>
               )}
             </>
           ) : (
-            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[var(--surface-hover)] rounded-xl flex items-center justify-center">
+            <div className="w-32 h-32 sm:w-40 sm:h-40 bg-[var(--surface-hover)] rounded-xl flex items-center justify-center">
               <svg className="w-10 h-10 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -76,7 +76,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
             {/* Meta info */}
-            <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)] mb-2 flex-wrap">
+            <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)] mb-1.5 flex-wrap">
               {headline.sources && (
                 <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
               )}
@@ -89,32 +89,32 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
 
             {/* Title */}
             <Link href={`/headline/${headline.slug}`}>
-              <h3 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] leading-snug line-clamp-2 hover:text-[var(--accent)] transition-colors mb-1">
+              <h3 className="text-[15px] sm:text-lg font-semibold text-[var(--text-primary)] leading-snug line-clamp-3 hover:text-[var(--accent)] transition-colors">
                 {headline.title}
               </h3>
             </Link>
 
-            {/* Summary */}
+            {/* Summary — hidden on small screens to save space */}
             {headline.ai_summary && (
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+              <p className="hidden sm:block text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2 mt-1.5">
                 {headline.ai_summary}
               </p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between gap-2 mt-3">
+          <div className="flex items-center justify-between gap-2 mt-2">
             <div className="flex items-center gap-1">
               <Link
                 href={`/headline/${headline.slug}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] text-white text-xs font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] text-white text-xs font-semibold rounded-lg hover:bg-[var(--accent-hover)] active:scale-95 transition-all"
               >
-                Read Summary
+                Read
                 <ArrowRight className="w-3 h-3" />
               </Link>
               <button
                 onClick={() => setBookmarked(!bookmarked)}
-                className={`p-1.5 rounded-lg transition-colors ${
+                className={`p-1.5 rounded-lg active:scale-90 transition-all ${
                   bookmarked
                     ? 'text-[var(--accent)] bg-[var(--accent)]/10'
                     : 'text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)]'

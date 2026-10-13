@@ -9,7 +9,7 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 import Link from 'next/link';
 import Image from 'next/image';
 import SourceBadge from '@/components/SourceBadge';
-import { TrendingUp, TrendingDown, BookOpen, ArrowRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -195,7 +195,7 @@ export default async function HomePage() {
   const CompactItem = ({ item, showArrow = false }: { item: any; showArrow?: boolean }) => (
     <Link
       href={`/headline/${item.slug}`}
-      className="flex items-center gap-3 p-3 hover:bg-[var(--surface-hover)] transition-colors border-b border-[var(--border)] last:border-b-0 group"
+      className="flex items-center gap-3 p-3 hover:bg-[var(--surface-hover)] active:bg-[var(--surface-hover)] transition-colors border-b border-[var(--border)] last:border-b-0 group"
     >
       {showArrow && item.arrow && (
         <span className="flex items-center gap-1">
@@ -244,8 +244,8 @@ export default async function HomePage() {
           loading="lazy"
         />
       </a>
-      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-[0.15em] mt-1.5 text-center font-medium">
-        Ad
+      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-[0.2em] mt-2 text-center font-medium">
+        Advertisement
       </p>
     </div>
   );
@@ -304,7 +304,7 @@ export default async function HomePage() {
           {/* Mobile category nav */}
           <div className="md:hidden mb-6 relative -mx-4">
             <div className="flex items-center gap-2 overflow-x-auto pb-3 px-4 no-scrollbar">
-              <span className="flex-shrink-0 px-4 py-2 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md">
+              <span className="flex-shrink-0 px-5 py-2.5 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md whitespace-nowrap">
                 Headlines
               </span>
               {navCategories.map((item) => {
@@ -313,7 +313,7 @@ export default async function HomePage() {
                   <Link
                     key={href}
                     href={href}
-                    className="flex-shrink-0 px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] transition-all"
+                    className="flex-shrink-0 px-5 py-2.5 bg-[var(--surface)] text-[var(--text-secondary)] text-sm font-medium rounded-full border border-[var(--border)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)] active:scale-95 transition-all whitespace-nowrap"
                   >
                     {item.label}
                   </Link>
@@ -323,7 +323,7 @@ export default async function HomePage() {
             <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
           </div>
 
-          {/* Mobile Trending — Stories style */}
+          {/* Mobile Trending — Stories style with full-image display */}
           <div className="md:hidden mb-7">
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
@@ -338,7 +338,7 @@ export default async function HomePage() {
                 <Link
                   key={headline.id}
                   href={`/headline/${headline.slug}`}
-                  className="flex-shrink-0 w-[75vw] max-w-[320px] relative rounded-2xl overflow-hidden aspect-[4/5] shadow-md border border-[var(--border)] group"
+                  className="flex-shrink-0 w-[75vw] max-w-[320px] relative rounded-2xl overflow-hidden aspect-[4/5] shadow-md border border-[var(--border)] bg-black active:scale-[0.98] transition-transform duration-150"
                 >
                   {headline.image_url ? (
                     <Image
@@ -346,7 +346,7 @@ export default async function HomePage() {
                       alt={headline.title}
                       fill
                       sizes="(max-width: 768px) 75vw, 320px"
-                      className="object-cover transition-transform duration-500 group-active:scale-105"
+                      className="object-contain"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
@@ -356,9 +356,6 @@ export default async function HomePage() {
                       </svg>
                     </div>
                   )}
-
-                  {/* Bottom-up gradient for text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
                   {/* Top row: trend arrow + source */}
                   <div className="absolute top-3 left-3 right-3 flex items-center gap-2 z-10">
@@ -373,7 +370,7 @@ export default async function HomePage() {
                       </span>
                     )}
                     {headline.sources && (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm text-[10px] text-white/90">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] text-white/90">
                         <img
                           alt=""
                           className="w-3 h-3 rounded-sm"
@@ -385,7 +382,8 @@ export default async function HomePage() {
                     )}
                   </div>
 
-                  {/* Bottom title */}
+                  {/* Bottom gradient + title */}
+                  <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/95 via-black/60 to-transparent z-[5]" />
                   <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
                     <h3 className="text-white text-[15px] font-semibold leading-snug line-clamp-3 drop-shadow-md">
                       {headline.title}
@@ -399,20 +397,18 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Mobile Vibestale Explains preview */}
+          {/* Mobile Explains preview — no icon, See all is a button */}
           {latestExplainers.length > 0 && (
             <div className="md:hidden mb-7">
               <div className="flex items-center justify-between mb-3.5">
-                <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk inline-flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-[var(--accent)]" />
+                <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
                   Explains
                 </h2>
                 <Link
                   href="/explains"
-                  className="text-xs font-semibold text-[var(--accent)] inline-flex items-center gap-1"
+                  className="text-xs font-semibold px-3.5 py-1.5 bg-[var(--accent)] text-white rounded-full hover:bg-[var(--accent-hover)] active:scale-95 transition-all"
                 >
                   See all
-                  <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
               <div className="space-y-2.5">
@@ -420,7 +416,7 @@ export default async function HomePage() {
                   <Link
                     key={explainer.slug}
                     href={`/explains/${explainer.slug}`}
-                    className="block relative bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 pl-5 hover:border-[var(--accent)]/40 transition-colors group overflow-hidden"
+                    className="block relative bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 pl-5 hover:border-[var(--accent)]/40 active:scale-[0.98] transition-all group overflow-hidden"
                   >
                     <span className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-[var(--accent)]" />
                     <span className="px-2 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-semibold rounded-full uppercase tracking-wide">
@@ -451,11 +447,9 @@ export default async function HomePage() {
 
                 <NewsletterSignup />
 
-                {/* Desktop Vibestale Explains preview */}
                 {latestExplainers.length > 0 && (
                   <section>
-                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk inline-flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-[var(--accent)]" />
+                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-3 font-space-grotesk">
                       Vibestale Explains
                     </h2>
                     <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
