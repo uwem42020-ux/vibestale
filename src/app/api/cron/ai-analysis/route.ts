@@ -7,6 +7,11 @@ import { fetchArticleImage } from '@/lib/news/fetchArticleImage';
 // Score is 0-10. 8+ means breaking news (major policy, big events, etc.)
 const BREAKING_URGENCY_THRESHOLD = 8;
 
+// Batch size per cron run. GitHub Actions has no timeout issue, so we can
+// process more per run to clear the backlog faster.
+const HEADLINE_BATCH_SIZE = 50;
+const ENTERTAINMENT_BATCH_SIZE = 10;
+
 export async function GET(req: Request) {
   // Protect endpoint with cron secret
   const authHeader = req.headers.get('authorization');
@@ -16,13 +21,13 @@ export async function GET(req: Request) {
 
   const supabase = await createClient();
 
-  // Process News Headlines (newest first, limit 10)
+  // Process News Headlines (newest first)
   const { data: pendingHeadlines, error: headlineError } = await supabase
     .from('headlines')
     .select('id, title, original_url')
     .eq('ai_analysis_status', 'pending')
     .order('fetched_at', { ascending: false })
-    .limit(10);
+    .limit(HEADLINE_BATCH_SIZE);
 
   if (headlineError) {
     console.error('Error fetching pending headlines:', headlineError);
@@ -83,13 +88,13 @@ export async function GET(req: Request) {
     }
   }
 
-  // Process Entertainment News (newest first, limit 10)
+  // Process Entertainment News (newest first)
   const { data: pendingEntertainment, error: entertainmentError } = await supabase
     .from('entertainment_news')
     .select('id, title, original_url')
     .eq('ai_analysis_status', 'pending')
     .order('fetched_at', { ascending: false })
-    .limit(10);
+    .limit(ENTERTAINMENT_BATCH_SIZE);
 
   if (entertainmentError) {
     console.error('Error fetching pending entertainment:', entertainmentError);
@@ -132,5 +137,16 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json(results);
+  // Log how many pending items remain (useful for monitoring backlog)
+  const { count: remainingPending } = await supabase
+    .from('headlines')
+    .select('id', { count: 'exact', head: true })
+    .eq('ai_analysis_status', 'pending');
+
+  console.log(`Cron complete. Remaining pending headlines: ${remainingPending}`);
+
+  return NextResponse.json({
+    ...results,
+    remainingPending,
+  });
 }
