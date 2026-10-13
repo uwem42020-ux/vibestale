@@ -39,9 +39,9 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
   const [bookmarked, setBookmarked] = useState(false);
 
   return (
-    <article className="group relative bg-[var(--surface)] rounded-2xl shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-150 border border-[var(--border)] hover:border-[var(--accent)]/30 overflow-hidden">
+    <article className="group relative bg-[var(--surface)] rounded-2xl shadow-sm hover:shadow-lg active:scale-[0.98] transition-all duration-150 border border-[var(--border)] hover:border-[var(--accent)]/30">
       <div className="flex gap-3 p-3">
-        {/* Image — bigger on both mobile and desktop */}
+        {/* Image */}
         <Link
           href={`/headline/${headline.slug}`}
           className="flex-shrink-0 relative rounded-xl overflow-hidden"
@@ -58,7 +58,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
                 referrerPolicy="no-referrer"
               />
               {headline.category && (
-                <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium rounded-full capitalize">
+                <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 bg-white/95 text-black text-[10px] font-bold uppercase tracking-wide rounded-sm shadow-sm">
                   {headline.category}
                 </span>
               )}
@@ -94,7 +94,7 @@ export default function HeadlineCard({ headline }: { headline: Headline }) {
               </h3>
             </Link>
 
-            {/* Summary — hidden on small screens to save space */}
+            {/* Summary — hidden on small screens */}
             {headline.ai_summary && (
               <p className="hidden sm:block text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2 mt-1.5">
                 {headline.ai_summary}

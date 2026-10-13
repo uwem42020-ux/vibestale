@@ -323,7 +323,7 @@ export default async function HomePage() {
             <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
           </div>
 
-          {/* Mobile Trending — Stories style with full-image display */}
+          {/* Mobile Trending — Stories style with blurred backdrop */}
           <div className="md:hidden mb-7">
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
@@ -338,17 +338,28 @@ export default async function HomePage() {
                 <Link
                   key={headline.id}
                   href={`/headline/${headline.slug}`}
-                  className="flex-shrink-0 w-[75vw] max-w-[320px] relative rounded-2xl overflow-hidden aspect-[4/5] shadow-md border border-[var(--border)] bg-black active:scale-[0.98] transition-transform duration-150"
+                  className="flex-shrink-0 w-[75vw] max-w-[320px] relative rounded-2xl overflow-hidden aspect-[4/5] shadow-md border border-[var(--border)] bg-[var(--surface-hover)] active:scale-[0.98] transition-transform duration-150"
                 >
                   {headline.image_url ? (
-                    <Image
-                      src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
-                      alt={headline.title}
-                      fill
-                      sizes="(max-width: 768px) 75vw, 320px"
-                      className="object-contain"
-                      referrerPolicy="no-referrer"
-                    />
+                    <>
+                      <Image
+                        src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 75vw, 320px"
+                        className="object-cover scale-125 blur-2xl opacity-70"
+                        referrerPolicy="no-referrer"
+                        aria-hidden="true"
+                      />
+                      <Image
+                        src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
+                        alt={headline.title}
+                        fill
+                        sizes="(max-width: 768px) 75vw, 320px"
+                        className="object-contain relative z-[1]"
+                        referrerPolicy="no-referrer"
+                      />
+                    </>
                   ) : (
                     <div className="absolute inset-0 bg-[var(--surface-hover)] flex items-center justify-center">
                       <svg className="w-12 h-12 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,7 +368,7 @@ export default async function HomePage() {
                     </div>
                   )}
 
-                  {/* Top row: trend arrow + source */}
+                  {/* Top row */}
                   <div className="absolute top-3 left-3 right-3 flex items-center gap-2 z-10">
                     {headline.arrow === 'up' && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/90 backdrop-blur-sm shadow-lg">
@@ -397,7 +408,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Mobile Explains preview — no icon, See all is a button */}
+          {/* Mobile Explains preview */}
           {latestExplainers.length > 0 && (
             <div className="md:hidden mb-7">
               <div className="flex items-center justify-between mb-3.5">
