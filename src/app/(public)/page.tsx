@@ -228,21 +228,26 @@ export default async function HomePage() {
   );
 
   const SmallAdvertBanner = () => (
-    <a
-      href="https://nimart.ng"
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-      className="block w-full rounded-xl overflow-hidden border border-[var(--border)]"
-    >
-      <Image
-        src="/advert%20design.png"
-        alt="Advertisement"
-        className="w-full h-auto object-cover"
-        width={320}
-        height={100}
-        loading="lazy"
-      />
-    </a>
+    <div className="w-full">
+      <a
+        href="https://nimart.ng"
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+        className="block w-full rounded-xl overflow-hidden border border-[var(--border)] hover:border-[var(--accent)]/40 transition-colors"
+      >
+        <Image
+          src="/advert%20design.png"
+          alt="Advertisement"
+          className="w-full h-auto object-cover"
+          width={320}
+          height={100}
+          loading="lazy"
+        />
+      </a>
+      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-[0.15em] mt-1.5 text-center font-medium">
+        Ad
+      </p>
+    </div>
   );
 
   const organizationJsonLd = {
@@ -296,9 +301,9 @@ export default async function HomePage() {
         <PortraitAdBanner />
 
         <div className="flex-1 min-w-0">
-          {/* Mobile category nav (top) */}
-          <div className="md:hidden mb-6 relative">
-            <div className="flex items-center gap-2 overflow-x-auto pb-3 no-scrollbar">
+          {/* Mobile category nav */}
+          <div className="md:hidden mb-6 relative -mx-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-3 px-4 no-scrollbar">
               <span className="flex-shrink-0 px-4 py-2 bg-[var(--accent)] text-white text-sm font-semibold rounded-full shadow-md">
                 Headlines
               </span>
@@ -315,51 +320,77 @@ export default async function HomePage() {
                 );
               })}
             </div>
-            <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-[var(--background)] to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
           </div>
 
-          {/* Mobile Trending slider */}
-          <div className="md:hidden mb-6">
-            <div className="flex items-center justify-between mb-3">
+          {/* Mobile Trending — Stories style */}
+          <div className="md:hidden mb-7">
+            <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk">
-                Trending News
+                Trending
               </h2>
               <div className="flex-shrink-0">
                 <LiveClock initialTime={serverNow} />
               </div>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-3 no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {trendingWithArrows.map((headline) => (
                 <Link
                   key={headline.id}
                   href={`/headline/${headline.slug}`}
-                  className="flex-shrink-0 w-48 group bg-[var(--surface)] rounded-xl p-2.5 shadow-sm border border-[var(--border)]"
+                  className="flex-shrink-0 w-[75vw] max-w-[320px] relative rounded-2xl overflow-hidden aspect-[4/5] shadow-md border border-[var(--border)] group"
                 >
-                  <div className="flex items-center gap-1 mb-1.5 px-0.5">
-                    {headline.arrow === 'up' && <TrendingUp className="w-4 h-4 text-green-500 animate-bounce" />}
-                    {headline.arrow === 'down' && <TrendingDown className="w-4 h-4 text-red-500 animate-pulse" />}
-                    {headline.sources && (
-                      <SourceBadge name={headline.sources.name} baseUrl={headline.sources.base_url} />
-                    )}
-                  </div>
                   {headline.image_url ? (
                     <Image
                       src={`/api/image?url=${encodeURIComponent(headline.image_url)}`}
                       alt={headline.title}
-                      className="w-full h-24 object-cover rounded-lg"
-                      width={192}
-                      height={96}
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 768px) 75vw, 320px"
+                      className="object-cover transition-transform duration-500 group-active:scale-105"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-24 bg-[var(--surface-hover)] rounded-lg flex items-center justify-center">
-                      <svg className="w-8 h-8 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <div className="absolute inset-0 bg-[var(--surface-hover)] flex items-center justify-center">
+                      <svg className="w-12 h-12 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
                     </div>
                   )}
-                  <span className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 mt-2 block px-0.5">
-                    {headline.title}
-                  </span>
+
+                  {/* Bottom-up gradient for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+                  {/* Top row: trend arrow + source */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center gap-2 z-10">
+                    {headline.arrow === 'up' && (
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/90 backdrop-blur-sm shadow-lg">
+                        <TrendingUp className="w-3.5 h-3.5 text-white" />
+                      </span>
+                    )}
+                    {headline.arrow === 'down' && (
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/90 backdrop-blur-sm shadow-lg">
+                        <TrendingDown className="w-3.5 h-3.5 text-white" />
+                      </span>
+                    )}
+                    {headline.sources && (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm text-[10px] text-white/90">
+                        <img
+                          alt=""
+                          className="w-3 h-3 rounded-sm"
+                          loading="lazy"
+                          src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(headline.sources.base_url)}&sz=32`}
+                        />
+                        <span className="truncate max-w-[110px]">{headline.sources.name}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Bottom title */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                    <h3 className="text-white text-[15px] font-semibold leading-snug line-clamp-3 drop-shadow-md">
+                      {headline.title}
+                    </h3>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -370,11 +401,11 @@ export default async function HomePage() {
 
           {/* Mobile Vibestale Explains preview */}
           {latestExplainers.length > 0 && (
-            <div className="md:hidden mb-6">
-              <div className="flex items-center justify-between mb-3">
+            <div className="md:hidden mb-7">
+              <div className="flex items-center justify-between mb-3.5">
                 <h2 className="text-xl font-bold text-[var(--text-primary)] font-space-grotesk inline-flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-[var(--accent)]" />
-                  Vibestale Explains
+                  Explains
                 </h2>
                 <Link
                   href="/explains"
@@ -389,12 +420,13 @@ export default async function HomePage() {
                   <Link
                     key={explainer.slug}
                     href={`/explains/${explainer.slug}`}
-                    className="block bg-[var(--surface)] rounded-xl border border-[var(--border)] p-4 hover:border-[var(--accent)]/40 transition-colors group"
+                    className="block relative bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 pl-5 hover:border-[var(--accent)]/40 transition-colors group overflow-hidden"
                   >
-                    <span className="px-2 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-medium rounded-full">
+                    <span className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-[var(--accent)]" />
+                    <span className="px-2 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-semibold rounded-full uppercase tracking-wide">
                       {explainer.category}
                     </span>
-                    <h3 className="text-sm font-medium text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--accent)] transition-colors mt-2">
+                    <h3 className="text-[15px] font-semibold text-[var(--text-primary)] line-clamp-2 group-active:text-[var(--accent)] transition-colors mt-2">
                       {explainer.title}
                     </h3>
                   </Link>
